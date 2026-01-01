@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المدير الذكي 2026 (Full Pro)</title>
+    <title>المدير الذكي 2026 (FIFO System)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -13,49 +13,45 @@
             --text: #2b2d42; --text-light: #8d99ae;
             --work: #4caf50; --holiday: #ffc107; --sick: #ff9800;
             --absent: #f44336; --eid: #9c27b0; --recup: #00bcd4;
-            --radius: 16px; --shadow: 0 4px 20px rgba(0,0,0,0.05);
+            --radius: 16px;
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Cairo', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 80px; color: var(--text); }
 
-        /* Auth */
+        /* Auth Screen */
         #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), #4cc9f0); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
         .auth-card { background: rgba(255,255,255,0.98); padding: 30px; border-radius: 24px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .app-input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-family: inherit; font-size: 1rem; margin-bottom: 10px; outline: none; transition: 0.3s; }
+        .auth-header h2 { color: var(--primary-dark); margin: 0 0 10px 0; }
+        .input-group { position: relative; margin-bottom: 15px; }
+        .app-input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-family: inherit; font-size: 1rem; outline: none; transition: 0.3s; }
         .app-input:focus { border-color: var(--primary); }
+        .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.2rem; }
         .btn-main { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-secondary { background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
-        .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.2rem; }
-        
-        /* Messages */
-        .error-msg { color: #d32f2f; font-size: 0.85rem; margin-top: 10px; display: none; background: #ffebee; padding: 8px; border-radius: 8px; }
-        .success-msg { color: #2e7d32; font-size: 0.85rem; margin-top: 10px; display: none; background: #e8f5e9; padding: 8px; border-radius: 8px; }
-        .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.4s; }
+        .btn-close-modal { width: 100%; padding: 12px; margin-top: 15px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .error-msg { color: #d32f2f; display: none; background: #ffebee; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
+        .success-msg { color: #2e7d32; display: none; background: #e8f5e9; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
+        .view-section { display: none; } .view-section.active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Loader */
         .loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:10000; display:none; justify-content:center; align-items:center; }
 
         /* App Layout */
         #app-container { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .action-btn { background: #f0f2f5; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
 
-        /* Stats Grid */
+        /* Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: var(--surface); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; }
-        .stat-card:active { transform: scale(0.98); background: #f0f9ff; }
-        .stat-card h4 { margin: 0 0 5px 0; font-size: 0.75rem; color: var(--text-light); pointer-events: none; }
-        .stat-card .val { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); pointer-events: none; }
-        .stat-card .sub { font-size: 0.6rem; color: #999; pointer-events: none; }
+        .stat-card { background: var(--surface); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); cursor: pointer; }
+        .stat-card h4 { margin: 0; font-size: 0.75rem; color: var(--text-light); }
+        .stat-card .val { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); }
+        .stat-card .sub { font-size: 0.6rem; color: #999; }
         .full-width { grid-column: span 2; }
-        
         .txt-red { color: #f44336 !important; } .txt-green { color: #4caf50 !important; }
 
         /* Calendar */
-        .calendar-box { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: var(--shadow); }
+        .calendar-box { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-name { font-size: 0.75rem; color: var(--text-light); text-align: center; font-weight: bold; }
@@ -63,7 +59,6 @@
         .day-cell.today { border-color: var(--primary); background: #e3f2fd; }
         .day-badge { font-size: 0.6rem; margin-top: 2px; border-radius: 4px; padding: 1px 4px; color: white; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; }
         
-        /* Colors */
         .st-work { background: var(--work); } .st-holiday { background: var(--holiday); color: #333 !important; }
         .st-sick { background: var(--sick); } .st-absent { background: var(--absent); }
         .st-eid { background: var(--eid); } .st-recup { background: var(--recup); }
@@ -77,40 +72,25 @@
         .btn-del { background: #ffebee; color: #f44336; flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
         .hidden { display: none; }
         
-        /* --- NEW: Redesigned Close Button --- */
-        .btn-close-modal {
-            width: 100%; padding: 12px; margin-top: 15px;
-            background: #f1f5f9; color: #475569;
-            border: 1px solid #e2e8f0; border-radius: 12px;
-            font-weight: bold; font-family: 'Cairo', sans-serif;
-            cursor: pointer; transition: 0.2s;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
-        .btn-close-modal:hover { background: #e2e8f0; }
-        .btn-close-modal::before { content: '✖'; font-size: 0.9rem; }
-
         /* Lists */
         .preset-item, .search-item, .detail-item { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 10px; margin-bottom: 6px; font-size: 0.9rem; border-left: 4px solid transparent; }
-        .detail-item { border-left-color: #e0e0e0; }
-        .detail-item.pos { border-left-color: var(--work); }
-        .detail-item.neg { border-left-color: var(--absent); }
-        .detail-item.neutral { border-left-color: var(--primary); }
-        
+        .detail-item.pos { border-left-color: var(--work); } .detail-item.neg { border-left-color: var(--absent); } .detail-item.neutral { border-left-color: var(--primary); }
         .del-icon { color: red; font-weight: bold; padding: 5px 10px; cursor: pointer; background: #fff; border-radius: 5px; }
         .d-val { font-weight: bold; direction: ltr; font-family: monospace; font-size: 1rem; }
         .d-val.pos { color: var(--work); } .d-val.neg { color: var(--absent); } .d-val.neutral { color: #666; }
+        
+        .details-header { font-weight: bold; margin: 15px 0 10px; color: var(--primary-dark); font-size: 0.95rem; border-bottom: 2px solid #eee; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div id="loader" class="loading"><div style="width:40px;height:40px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin 1s infinite"></div></div>
 
-    <!-- Auth System -->
+    <!-- Auth -->
     <div id="auth-overlay">
         <div class="auth-card">
-            <!-- Login -->
             <div id="view-login" class="view-section active">
-                <h2 style="color:var(--primary-dark); margin-bottom:20px;">تسجيل الدخول</h2>
+                <div class="auth-header"><h2>تسجيل الدخول</h2><p>مرحباً بك مجدداً</p></div>
                 <div class="input-group"><input type="email" id="login-email" class="app-input" placeholder="البريد الإلكتروني"></div>
                 <div class="input-group"><input type="password" id="login-pass" class="app-input" placeholder="كلمة المرور"><span class="toggle-password" onclick="togglePass('login-pass')">👁️</span></div>
                 <div style="display:flex; align-items:center; margin-bottom:15px; font-size:0.9rem;"><input type="checkbox" id="remember-me" style="margin-left:8px;"> <label for="remember-me">تذكرني</label></div>
@@ -119,20 +99,18 @@
                 <div style="margin-top:15px;"><span style="color:var(--primary); cursor:pointer; font-size:0.9rem;" onclick="switchView('view-reset')">نسيت كلمة المرور؟</span></div>
                 <div id="login-error" class="error-msg"></div>
             </div>
-            <!-- Signup -->
             <div id="view-signup" class="view-section">
-                <h2 style="color:var(--primary-dark); margin-bottom:10px;">حساب جديد</h2>
-                <input type="email" id="reg-email" class="app-input" placeholder="البريد الإلكتروني">
+                <div class="auth-header"><h2>إنشاء حساب جديد</h2><p>سيصلك رابط تفعيل على الإيميل</p></div>
+                <div class="input-group"><input type="email" id="reg-email" class="app-input" placeholder="البريد الإلكتروني"></div>
                 <div class="input-group"><input type="password" id="reg-pass" class="app-input" placeholder="كلمة المرور"><span class="toggle-password" onclick="togglePass('reg-pass')">👁️</span></div>
                 <div class="input-group"><input type="password" id="reg-confirm" class="app-input" placeholder="تأكيد كلمة المرور"></div>
                 <button class="btn-main" onclick="handleSignup()">تسجيل</button>
                 <button class="btn-main btn-secondary" onclick="switchView('view-login')">عودة للدخول</button>
                 <div id="reg-error" class="error-msg"></div><div id="reg-success" class="success-msg"></div>
             </div>
-            <!-- Reset -->
             <div id="view-reset" class="view-section">
-                <h2 style="color:var(--primary-dark);">استعادة كلمة المرور</h2>
-                <input type="email" id="reset-email" class="app-input" placeholder="البريد الإلكتروني">
+                <div class="auth-header"><h2>استعادة كلمة المرور</h2><p>أدخل بريدك لاستلام رابط التعيين</p></div>
+                <div class="input-group"><input type="email" id="reset-email" class="app-input" placeholder="البريد الإلكتروني"></div>
                 <button class="btn-main" onclick="handleReset()">إرسال الرابط</button>
                 <button class="btn-main btn-secondary" onclick="switchView('view-login')">عودة</button>
                 <div id="reset-msg" class="success-msg"></div><div id="reset-error" class="error-msg"></div>
@@ -140,7 +118,7 @@
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- App -->
     <div id="app-container">
         <div class="header">
             <div><h3 style="margin:0">مرحباً <span id="u-name"></span></h3><span id="u-role" style="font-size:0.8rem; color:#888;"></span></div>
@@ -155,7 +133,7 @@
             <div class="stat-card" onclick="window.app.showDetails('net')"><h4>رصيد الساعات</h4><div class="val" id="st-net">0</div><div class="sub">ميزان (+/- 8س)</div></div>
             <div class="stat-card" onclick="window.app.showDetails('sat')"><h4>رصيد السبت</h4><div class="val" id="st-sat">0</div><div class="sub">عمل (+4) / آخر (-4)</div></div>
             <div class="stat-card" onclick="window.app.showDetails('sunday')"><h4>الأحد والأعياد</h4><div class="val" id="st-sunday">0</div><div class="sub">يوم تعويض</div></div>
-            <div class="stat-card" onclick="window.app.showDetails('leave')"><h4>رصيد العطلة</h4><div class="val" id="st-leave">0</div><div class="sub">يوم متبقي</div></div>
+            <div class="stat-card" onclick="window.app.showDetails('leave')"><h4>رصيد العطلة</h4><div class="val" id="st-leave">0</div><div class="sub">متراكم من الأقدم</div></div>
             <div class="stat-card" onclick="window.app.showDetails('week')"><h4>هذا الأسبوع</h4><div class="val" id="st-week">0</div></div>
             <div class="stat-card" onclick="window.app.showDetails('month')"><h4>هذا الشهر</h4><div class="val" id="st-month">0</div></div>
             <div class="stat-card full-width" onclick="window.app.showDetails('year')"><h4>مجموع السنة</h4><div class="val" id="st-year">0</div></div>
@@ -171,7 +149,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Day Modal -->
     <div class="modal-overlay" id="dayModal">
         <div class="modal-content">
             <h3 id="modal-title" style="text-align:center; margin-bottom:20px;"></h3>
@@ -195,6 +173,7 @@
         </div>
     </div>
 
+    <!-- Search Modal -->
     <div class="modal-overlay" id="searchModal">
         <div class="modal-content">
             <h3 id="search-title" style="text-align:center;">بحث / تفاصيل</h3>
@@ -206,13 +185,7 @@
                         <option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option>
                     </select>
                     <select id="search-type" class="app-input" onchange="window.app.performSearch()">
-                        <option value="">-- كل الحالات --</option>
-                        <option value="work">✅ عمل</option>
-                        <option value="holiday">🏖️ عطلة سنوية</option>
-                        <option value="sick">💊 مرض</option>
-                        <option value="eid">🎉 أعياد</option>
-                        <option value="recup">🔄 تعويض</option>
-                        <option value="absent">❌ غياب</option>
+                        <option value="">-- كل الحالات --</option><option value="work">✅ عمل</option><option value="holiday">🏖️ عطلة</option><option value="sick">💊 مرض</option><option value="eid">🎉 أعياد</option><option value="recup">🔄 تعويض</option><option value="absent">❌ غياب</option>
                     </select>
                 </div>
             </div>
@@ -221,6 +194,7 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <h3 style="text-align:center;">الإعدادات</h3>
@@ -234,14 +208,12 @@
                 <label class="form-label">تاريخ التحاقي:</label><input type="date" id="s-join" class="app-input">
             </div>
             <div style="background:#fff3e0; padding:10px; border-radius:10px; margin-bottom:15px;">
-                <label class="form-label">رصيد عطلة إضافي:</label>
-                <div style="display:flex; gap:5px;"><input type="number" id="adj-days" class="app-input" placeholder="أيام"><input type="text" id="adj-note" class="app-input" placeholder="سبب"></div>
+                <label class="form-label">رصيد عطلة إضافي (أيام سابقة):</label>
+                <div style="display:flex; gap:5px;"><input type="number" id="adj-days" class="app-input" placeholder="أيام"><input type="text" id="adj-note" class="app-input" placeholder="مثلاً: رصيد 2025"></div>
                 <button class="btn-main" onclick="window.app.addAdj()" style="background:#ff9800; font-size:0.8rem; padding:8px;">+ إضافة</button>
                 <div id="adj-list" style="margin-top:10px;"></div>
             </div>
-            <div class="modal-btns">
-                <button class="btn-save" onclick="window.app.saveSettings()">حفظ الكل</button>
-            </div>
+            <div class="modal-btns"><button class="btn-save" onclick="window.app.saveSettings()">حفظ الكل</button></div>
             <button class="btn-close-modal" onclick="document.getElementById('settingsModal').style.display='none'">إغلاق</button>
         </div>
     </div>
@@ -276,7 +248,6 @@
         };
         window.togglePass = (id) => { const el=document.getElementById(id); el.type = el.type==='password'?'text':'password'; };
 
-        // --- Auth Logic ---
         window.handleLogin = async () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
@@ -332,7 +303,6 @@
 
         window.handleLogout = async () => { await signOut(auth); window.location.reload(); };
 
-        // --- Data Logic (Live) ---
         window.saveData = async (type, data) => {
             const u = auth.currentUser;
             if(!u) return;
@@ -365,7 +335,6 @@
                     if(window.appData.role === 'admin') document.getElementById('admin-section').style.display = 'block';
                 }
 
-                // LISTENERS
                 onSnapshot(doc(db, "attendance", user.uid), (doc) => {
                     if(doc.exists()) window.appData.events = doc.data().events || {};
                     window.app.renderCalendar();
@@ -373,7 +342,7 @@
                 });
                 onSnapshot(doc(db, "settings", user.uid), (doc) => {
                     if(doc.exists()) window.appData.personal = doc.data() || {joinDate:'', adjustments:[]};
-                    window.app.calcStats();
+                    window.app.updateLogic(); 
                 });
                 onSnapshot(doc(db, "config", "general"), (doc) => {
                     if(doc.exists()) window.appData.global = doc.data() || {presets:[]};
@@ -404,13 +373,11 @@
                 const today = new Date(); today.setHours(0,0,0,0);
                 let startCheck = new Date(2026, 0, 1);
                 if (today < startCheck) return;
-
                 let defStart='08:00', defEnd='16:00';
                 if(window.appData.global.presets && window.appData.global.presets.length > 0) {
                     defStart = window.appData.global.presets[0].start;
                     defEnd = window.appData.global.presets[0].end;
                 }
-
                 let changes = false;
                 let loopDate = new Date(startCheck);
                 while (loopDate < today) {
@@ -452,7 +419,7 @@
                     const todayClass = (new Date().toDateString() === new Date(y,m,i).toDateString()) ? 'today' : '';
                     grid.innerHTML += `<div class="day-cell ${todayClass}" onclick="window.app.openDay('${key}')"><span>${i}</span>${evt ? `<div class="day-badge ${cls}">${txt}</div>` : ''}</div>`;
                 }
-                window.app.calcStats();
+                window.app.updateLogic();
             },
 
             navMonth: (s) => { currentDate.setMonth(currentDate.getMonth() + s); window.app.renderCalendar(); },
@@ -560,6 +527,65 @@
                 document.getElementById('dayModal').style.display = 'none';
             },
 
+            // --- Logic Hub ---
+            updateLogic: () => {
+                window.app.calcStats();
+            },
+
+            getLeaveBreakdown: () => {
+                const currentY = new Date(2026, 0, 1).getFullYear(); // Fixed to 2026 as per request start
+                const joinDateStr = window.appData.personal.joinDate;
+                let pools = [];
+
+                // 1. Manual Adjustments (Treated as Oldest/Previous)
+                if(window.appData.personal.adjustments) {
+                    window.appData.personal.adjustments.forEach((adj, i) => {
+                        pools.push({ id: `adj_${i}`, label: `رصيد سابق/إضافي (${adj.reason})`, total: parseFloat(adj.amount), remaining: parseFloat(adj.amount), type: 'bonus' });
+                    });
+                }
+
+                // 2. Yearly Entitlements
+                if(joinDateStr) {
+                    const joinD = new Date(joinDateStr);
+                    const joinY = joinD.getFullYear();
+                    // Loop from join year (or 2026 if joined earlier) up to CURRENT year (2026)
+                    // We DO NOT calculate for 2027+ yet
+                    const startCalc = Math.max(joinY, 2026);
+                    const endCalc = new Date().getFullYear(); // Or fixed 2026 if simulating
+                    
+                    // Specific logic: Only calculate for years <= current real year
+                    // If simulating 2026:
+                    for(let y = startCalc; y <= 2026; y++) {
+                        let months = 12;
+                        if(y === joinY) months = 12 - joinD.getMonth();
+                        let seniority = Math.floor((y - joinY)/5) * 1.5;
+                        let amount = Math.min((months * 1.5) + seniority, 30);
+                        if(amount > 0) pools.push({ id: y, label: `رصيد سنة ${y}`, total: amount, remaining: amount, type: 'year' });
+                    }
+                }
+
+                // 3. Deduct Holidays (FIFO)
+                const holidays = Object.entries(window.appData.events)
+                    .filter(([k, v]) => v.type === 'holiday')
+                    .sort((a, b) => new Date(a[0]) - new Date(b[0]));
+
+                let deductions = [];
+                holidays.forEach(h => {
+                    let consumed = false;
+                    for(let pool of pools) {
+                        if(pool.remaining > 0) {
+                            pool.remaining--;
+                            deductions.push({ date: h[0], note: `تم خصمه من ${pool.label}`, val: '-1', type: 'neg' });
+                            consumed = true;
+                            break;
+                        }
+                    }
+                    if(!consumed) deductions.push({ date: h[0], note: 'رصيد غير كافٍ', val: '-1', type: 'neg' });
+                });
+
+                return { pools, deductions };
+            },
+
             calcStats: () => {
                 let net = 0, sat = 0, leave = 0, pending = 0;
                 let tWeek = 0, tMonth = 0, tYear = 0;
@@ -569,20 +595,11 @@
                 const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay()); weekStart.setHours(0,0,0,0);
                 const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
 
-                if(window.appData.personal.joinDate) {
-                    const joinD = new Date(window.appData.personal.joinDate);
-                    const joinY = joinD.getFullYear();
-                    for(let y = 2026; y <= yr; y++) {
-                        let months = 12;
-                        if(y === joinY) months = 12 - joinD.getMonth();
-                        if(y < joinY) months = 0;
-                        let seniority = Math.floor((y - joinY)/5) * 1.5;
-                        leave += Math.min((months * 1.5) + seniority, 30);
-                    }
-                    (window.appData.personal.adjustments || []).forEach(a => leave += parseFloat(a.amount));
-                    Object.values(window.appData.events).forEach(e => { if(e.type === 'holiday') leave--; });
-                }
+                // Calculate Leave
+                const breakdown = window.app.getLeaveBreakdown();
+                leave = breakdown.pools.reduce((sum, pool) => sum + pool.remaining, 0);
 
+                // Day Loop
                 const startLoop = new Date(yr, 0, 1);
                 const limitLoop = (yr === today.getFullYear()) ? today : new Date(yr, 11, 31);
                 for (let d = new Date(startLoop); d <= limitLoop; d.setDate(d.getDate() + 1)) {
@@ -633,7 +650,28 @@
                 const yr = currentDate.getFullYear();
                 const today = new Date();
                 let tempList = [];
-                
+
+                if (cat === 'leave') {
+                    const bd = window.app.getLeaveBreakdown();
+                    
+                    list.innerHTML += `<div class="details-header">الأرصدة المتاحة (FIFO):</div>`;
+                    bd.pools.forEach(p => {
+                        if(p.remaining > 0) list.innerHTML += `<div class="detail-item pos"><span>${p.label}</span><span class="d-val">${p.remaining} يوم</span></div>`;
+                    });
+
+                    if(bd.deductions.length > 0) {
+                        list.innerHTML += `<div class="details-header">سجل الاستهلاك:</div>`;
+                        bd.deductions.reverse().forEach(d => {
+                            list.innerHTML += `<div class="detail-item neg"><span>${d.date} <small>(${d.note})</small></span><span class="d-val">-1</span></div>`;
+                        });
+                    } else {
+                        list.innerHTML += `<div style="text-align:center; padding:10px;">لم يتم استهلاك أي عطلة</div>`;
+                    }
+                    document.getElementById('searchModal').style.display = 'flex';
+                    return;
+                }
+
+                // ... (Logic for other categories sat, net, etc. remains same as previous code)
                 if (cat === 'sat') {
                     const start = new Date(yr, 0, 1);
                     const limit = (yr === today.getFullYear()) ? today : new Date(yr, 11, 31);
@@ -646,8 +684,7 @@
                             tempList.push({date:k, note:st, val:(val>0?'+':'')+val, type});
                         }
                     }
-                }
-                else if (cat === 'net') {
+                } else if (cat === 'net') {
                     for(const [k, evt] of Object.entries(window.appData.events)) {
                         if(new Date(k).getFullYear() !== yr) continue;
                         let diff = 0, note = '';
@@ -655,77 +692,31 @@
                         else if(evt.type==='absent') { diff = -8; note='غياب'; }
                         if(diff !== 0) tempList.push({date:k, note, val:(diff>0?'+':'')+diff.toFixed(1), type:diff>=0?'pos':'neg'});
                     }
-                }
-                else if (['week', 'month', 'year'].includes(cat)) {
-                    const mth = currentDate.getMonth();
-                    const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay()); weekStart.setHours(0,0,0,0);
-                    const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
-                    
-                    for(const [k, evt] of Object.entries(window.appData.events)) {
+                } else if (cat === 'sunday') {
+                     const used = Object.values(window.appData.events).filter(e => e.type === 'recup').map(e => e.recupTarget);
+                     for(const [k, evt] of Object.entries(window.appData.events)) {
                         const d = new Date(k);
-                        if(d.getFullYear() !== yr) continue;
-                        let valid = false;
-                        if(cat === 'year') valid = true;
-                        if(cat === 'month' && d.getMonth() === mth) valid = true;
-                        if(cat === 'week' && d >= weekStart && d <= weekEnd) valid = true;
-                        if(valid) {
-                            let hrs = 0;
-                            if(evt.type==='work' || (evt.type==='eid' && evt.eidStatus==='work')) hrs = evt.hours;
-                            else if(['holiday','sick'].includes(evt.type)) hrs = 8;
-                            if(hrs>0) tempList.push({date:k, note:evt.type, val:hrs+'س', type:'pos'});
+                        if((d.getDay()===0 && evt.type==='work') || (evt.type==='eid' && evt.eidStatus==='work')) {
+                            const isComp = used.includes(k);
+                            tempList.push({ date: k, note: evt.eidName || 'عمل يوم أحد', val: isComp ? 'تم التعويض' : 'مستحق', type: isComp ? 'neutral' : 'pos' });
                         }
-                    }
-                }
-                // NEW: Sunday & Holidays Details
-                else if (cat === 'sunday') {
-                    const used = Object.values(window.appData.events).filter(e => e.type === 'recup').map(e => e.recupTarget);
+                     }
+                } else if (['week', 'month', 'year'].includes(cat)) {
                     for(const [k, evt] of Object.entries(window.appData.events)) {
-                        const d = new Date(k);
-                        if ((d.getDay() === 0 && evt.type === 'work') || (evt.type === 'eid' && evt.eidStatus === 'work')) {
-                            const isUsed = used.includes(k);
-                            tempList.push({
-                                date: k,
-                                note: evt.eidName || 'عمل يوم أحد',
-                                val: isUsed ? 'تم التعويض' : 'مستحق',
-                                type: isUsed ? 'neutral' : 'pos'
-                            });
-                        }
-                    }
-                }
-                // NEW: Leave Balance Details
-                else if (cat === 'leave') {
-                    // 1. Entitlements
-                    if(window.appData.personal.joinDate) {
-                        const joinD = new Date(window.appData.personal.joinDate);
-                        const joinY = joinD.getFullYear();
-                        for(let y = 2026; y <= yr; y++) {
-                            let months = 12;
-                            if(y === joinY) months = 12 - joinD.getMonth();
-                            if(y < joinY) months = 0;
-                            let seniority = Math.floor((y - joinY)/5) * 1.5;
-                            const amount = Math.min((months * 1.5) + seniority, 30);
-                            tempList.push({date: `استحقاق ${y}`, note: `أقدمية ${(y-joinY)} سنة`, val: `+${amount}`, type: 'pos'});
-                        }
-                    }
-                    // 2. Adjustments
-                    (window.appData.personal.adjustments || []).forEach(adj => {
-                        tempList.push({date: 'رصيد إضافي', note: adj.reason, val: `+${adj.amount}`, type: 'pos'});
-                    });
-                    // 3. Taken
-                    for(const [k, evt] of Object.entries(window.appData.events)) {
-                        if(evt.type === 'holiday') {
-                            tempList.push({date: k, note: 'عطلة سنوية', val: '-1', type: 'neg'});
+                        if(new Date(k).getFullYear() === yr) {
+                            let h = 0;
+                            if(evt.type==='work' || (evt.type==='eid' && evt.eidStatus==='work')) h = evt.hours;
+                            else if(['holiday','sick'].includes(evt.type)) h = 8;
+                            if(h>0) tempList.push({date:k, note:evt.type, val:h+'س', type:'pos'});
                         }
                     }
                 }
 
                 tempList.sort((a,b) => new Date(b.date) - new Date(a.date));
                 if(tempList.length === 0) list.innerHTML = '<div style="text-align:center; padding:10px;">لا توجد بيانات</div>';
-                else {
-                    tempList.forEach(item => {
-                        list.innerHTML += `<div class="detail-item ${item.type}" onclick="window.app.openDay('${item.date}')"><span>${item.date} <small>(${item.note})</small></span><span class="d-val ${item.type}">${item.val}</span></div>`;
-                    });
-                }
+                tempList.forEach(item => {
+                    list.innerHTML += `<div class="detail-item ${item.type}" onclick="window.app.openDay('${item.date}')"><span>${item.date} <small>(${item.note})</small></span><span class="d-val ${item.type}">${item.val}</span></div>`;
+                });
                 document.getElementById('searchModal').style.display = 'flex';
             },
 
@@ -781,11 +772,7 @@
                 }
             },
 
-            delPreset: (i) => {
-                window.appData.global.presets.splice(i, 1);
-                window.app.renderSettingsLists();
-            },
-
+            delPreset: (i) => { window.appData.global.presets.splice(i, 1); window.app.renderSettingsLists(); },
             addAdj: () => {
                 const d = document.getElementById('adj-days').value;
                 const r = document.getElementById('adj-note').value;
@@ -797,26 +784,18 @@
                     window.app.renderSettingsLists();
                 }
             },
-
-            delAdj: (i) => {
-                window.appData.personal.adjustments.splice(i, 1);
-                window.app.renderSettingsLists();
-            },
+            delAdj: (i) => { window.appData.personal.adjustments.splice(i, 1); window.app.renderSettingsLists(); },
 
             renderSettingsLists: () => {
                 const pl = document.getElementById('presets-list');
                 pl.innerHTML = '';
                 if(window.appData.global.presets) {
-                    window.appData.global.presets.forEach((p, i) => {
-                        pl.innerHTML += `<div class="preset-item"><span>${p.label} (${p.start}-${p.end})</span> <span class="del-icon" onclick="window.app.delPreset(${i})">X</span></div>`;
-                    });
+                    window.appData.global.presets.forEach((p, i) => { pl.innerHTML += `<div class="preset-item"><span>${p.label} (${p.start}-${p.end})</span> <span class="del-icon" onclick="window.app.delPreset(${i})">X</span></div>`; });
                 }
                 const al = document.getElementById('adj-list');
                 al.innerHTML = '';
                 if(window.appData.personal.adjustments) {
-                    window.appData.personal.adjustments.forEach((a, i) => {
-                        al.innerHTML += `<div class="preset-item"><span>+${a.amount} (${a.reason})</span> <span class="del-icon" onclick="window.app.delAdj(${i})">X</span></div>`;
-                    });
+                    window.appData.personal.adjustments.forEach((a, i) => { al.innerHTML += `<div class="preset-item"><span>+${a.amount} (${a.reason})</span> <span class="del-icon" onclick="window.app.delAdj(${i})">X</span></div>`; });
                 }
             },
 
@@ -825,6 +804,7 @@
                 window.saveData('personal_settings', window.appData.personal);
                 if(window.appData.role === 'admin') window.saveData('global_config', window.appData.global);
                 document.getElementById('settingsModal').style.display = 'none';
+                window.app.renderCalendar();
             }
         };
     </script>

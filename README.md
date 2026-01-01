@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المدير الذكي 2026 (Fix Settings)</title>
+    <title>المدير الذكي 2026 (Full Pro)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -13,86 +13,57 @@
             --text: #2b2d42; --text-light: #8d99ae;
             --work: #4caf50; --holiday: #ffc107; --sick: #ff9800;
             --absent: #f44336; --eid: #9c27b0; --recup: #00bcd4;
-            --radius: 16px;
+            --radius: 16px; --shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Cairo', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 80px; color: var(--text); }
 
-        /* Auth Screen Styles */
-        #auth-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, var(--primary), #4cc9f0);
-            z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;
-        }
-        .auth-card {
-            background: rgba(255,255,255,0.98); padding: 30px; border-radius: 24px;
-            width: 90%; max-width: 380px; text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-        .auth-header h2 { color: var(--primary-dark); margin: 0 0 10px 0; }
-        
-        .input-group { position: relative; margin-bottom: 15px; }
-        .app-input {
-            width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px;
-            font-family: inherit; font-size: 1rem; outline: none; transition: 0.3s;
-        }
+        /* Auth */
+        #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), #4cc9f0); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .auth-card { background: rgba(255,255,255,0.98); padding: 30px; border-radius: 24px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .app-input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-family: inherit; font-size: 1rem; margin-bottom: 10px; outline: none; transition: 0.3s; }
         .app-input:focus { border-color: var(--primary); }
+        .btn-main { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-secondary { background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
+        .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.2rem; }
         
-        .toggle-password {
-            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-            cursor: pointer; color: #888; font-size: 1.2rem;
-        }
-
-        .btn-main {
-            width: 100%; padding: 12px; background: var(--primary); color: white;
-            border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
-            font-size: 1rem; transition: 0.2s; margin-top: 10px;
-        }
-        .btn-secondary {
-            background: transparent; color: var(--primary); border: 2px solid var(--primary);
-            margin-top: 10px;
-        }
-
-        .error-msg {
-            color: #d32f2f; font-size: 0.85rem; margin-top: 10px; display: none;
-            background: #ffebee; padding: 8px; border-radius: 8px; border: 1px solid #ffcdd2;
-        }
-        .success-msg {
-            color: #2e7d32; font-size: 0.85rem; margin-top: 10px; display: none;
-            background: #e8f5e9; padding: 8px; border-radius: 8px; border: 1px solid #c8e6c9;
-        }
-
+        /* Messages */
+        .error-msg { color: #d32f2f; font-size: 0.85rem; margin-top: 10px; display: none; background: #ffebee; padding: 8px; border-radius: 8px; }
+        .success-msg { color: #2e7d32; font-size: 0.85rem; margin-top: 10px; display: none; background: #e8f5e9; padding: 8px; border-radius: 8px; }
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Loader */
         .loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:10000; display:none; justify-content:center; align-items:center; }
-        
+
         /* App Layout */
         #app-container { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; }
         .action-btn { background: #f0f2f5; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
 
-        /* Stats & Calendar */
+        /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: var(--surface); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .stat-card h4 { margin: 0; font-size: 0.75rem; color: var(--text-light); }
-        .stat-card .val { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); }
-        .stat-card .sub { font-size: 0.6rem; color: #999; }
+        .stat-card { background: var(--surface); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; }
+        .stat-card:active { transform: scale(0.98); background: #f0f9ff; }
+        .stat-card h4 { margin: 0 0 5px 0; font-size: 0.75rem; color: var(--text-light); pointer-events: none; }
+        .stat-card .val { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); pointer-events: none; }
+        .stat-card .sub { font-size: 0.6rem; color: #999; pointer-events: none; }
         .full-width { grid-column: span 2; }
+        
         .txt-red { color: #f44336 !important; } .txt-green { color: #4caf50 !important; }
 
-        .calendar-box { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        /* Calendar */
+        .calendar-box { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: var(--shadow); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-name { font-size: 0.75rem; color: var(--text-light); text-align: center; font-weight: bold; }
-        .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: #f8f9fa; cursor: pointer; position: relative; border: 1px solid transparent; }
+        .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: #f8f9fa; cursor: pointer; border: 1px solid transparent; position: relative; }
         .day-cell.today { border-color: var(--primary); background: #e3f2fd; }
         .day-badge { font-size: 0.6rem; margin-top: 2px; border-radius: 4px; padding: 1px 4px; color: white; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; }
         
+        /* Colors */
         .st-work { background: var(--work); } .st-holiday { background: var(--holiday); color: #333 !important; }
         .st-sick { background: var(--sick); } .st-absent { background: var(--absent); }
         .st-eid { background: var(--eid); } .st-recup { background: var(--recup); }
@@ -106,24 +77,40 @@
         .btn-del { background: #ffebee; color: #f44336; flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
         .hidden { display: none; }
         
-        .preset-item, .search-item, .detail-item { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 5px; font-size: 0.9rem; }
-        .del-icon { color: red; font-weight: bold; padding: 0 8px; cursor: pointer; }
-        .d-val { font-weight: bold; direction: ltr; }
-        .d-val.pos { color: var(--work); } .d-val.neg { color: var(--absent); }
+        /* --- NEW: Redesigned Close Button --- */
+        .btn-close-modal {
+            width: 100%; padding: 12px; margin-top: 15px;
+            background: #f1f5f9; color: #475569;
+            border: 1px solid #e2e8f0; border-radius: 12px;
+            font-weight: bold; font-family: 'Cairo', sans-serif;
+            cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-close-modal:hover { background: #e2e8f0; }
+        .btn-close-modal::before { content: '✖'; font-size: 0.9rem; }
+
+        /* Lists */
+        .preset-item, .search-item, .detail-item { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 10px; margin-bottom: 6px; font-size: 0.9rem; border-left: 4px solid transparent; }
+        .detail-item { border-left-color: #e0e0e0; }
+        .detail-item.pos { border-left-color: var(--work); }
+        .detail-item.neg { border-left-color: var(--absent); }
+        .detail-item.neutral { border-left-color: var(--primary); }
+        
+        .del-icon { color: red; font-weight: bold; padding: 5px 10px; cursor: pointer; background: #fff; border-radius: 5px; }
+        .d-val { font-weight: bold; direction: ltr; font-family: monospace; font-size: 1rem; }
+        .d-val.pos { color: var(--work); } .d-val.neg { color: var(--absent); } .d-val.neutral { color: #666; }
     </style>
 </head>
 <body>
 
     <div id="loader" class="loading"><div style="width:40px;height:40px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin 1s infinite"></div></div>
-    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
     <!-- Auth System -->
     <div id="auth-overlay">
         <div class="auth-card">
-            
             <!-- Login -->
             <div id="view-login" class="view-section active">
-                <div class="auth-header"><h2>تسجيل الدخول</h2><p>مرحباً بك مجدداً</p></div>
+                <h2 style="color:var(--primary-dark); margin-bottom:20px;">تسجيل الدخول</h2>
                 <div class="input-group"><input type="email" id="login-email" class="app-input" placeholder="البريد الإلكتروني"></div>
                 <div class="input-group"><input type="password" id="login-pass" class="app-input" placeholder="كلمة المرور"><span class="toggle-password" onclick="togglePass('login-pass')">👁️</span></div>
                 <div style="display:flex; align-items:center; margin-bottom:15px; font-size:0.9rem;"><input type="checkbox" id="remember-me" style="margin-left:8px;"> <label for="remember-me">تذكرني</label></div>
@@ -132,22 +119,20 @@
                 <div style="margin-top:15px;"><span style="color:var(--primary); cursor:pointer; font-size:0.9rem;" onclick="switchView('view-reset')">نسيت كلمة المرور؟</span></div>
                 <div id="login-error" class="error-msg"></div>
             </div>
-
             <!-- Signup -->
             <div id="view-signup" class="view-section">
-                <div class="auth-header"><h2>إنشاء حساب جديد</h2><p>سيصلك رابط تفعيل على الإيميل</p></div>
-                <div class="input-group"><input type="email" id="reg-email" class="app-input" placeholder="البريد الإلكتروني"></div>
+                <h2 style="color:var(--primary-dark); margin-bottom:10px;">حساب جديد</h2>
+                <input type="email" id="reg-email" class="app-input" placeholder="البريد الإلكتروني">
                 <div class="input-group"><input type="password" id="reg-pass" class="app-input" placeholder="كلمة المرور"><span class="toggle-password" onclick="togglePass('reg-pass')">👁️</span></div>
                 <div class="input-group"><input type="password" id="reg-confirm" class="app-input" placeholder="تأكيد كلمة المرور"></div>
                 <button class="btn-main" onclick="handleSignup()">تسجيل</button>
                 <button class="btn-main btn-secondary" onclick="switchView('view-login')">عودة للدخول</button>
                 <div id="reg-error" class="error-msg"></div><div id="reg-success" class="success-msg"></div>
             </div>
-
             <!-- Reset -->
             <div id="view-reset" class="view-section">
-                <div class="auth-header"><h2>استعادة كلمة المرور</h2><p>أدخل بريدك لاستلام رابط التعيين</p></div>
-                <div class="input-group"><input type="email" id="reset-email" class="app-input" placeholder="البريد الإلكتروني"></div>
+                <h2 style="color:var(--primary-dark);">استعادة كلمة المرور</h2>
+                <input type="email" id="reset-email" class="app-input" placeholder="البريد الإلكتروني">
                 <button class="btn-main" onclick="handleReset()">إرسال الرابط</button>
                 <button class="btn-main btn-secondary" onclick="switchView('view-login')">عودة</button>
                 <div id="reset-msg" class="success-msg"></div><div id="reset-error" class="error-msg"></div>
@@ -161,10 +146,7 @@
             <div><h3 style="margin:0">مرحباً <span id="u-name"></span></h3><span id="u-role" style="font-size:0.8rem; color:#888;"></span></div>
             <div style="display:flex; gap:10px">
                 <button class="action-btn" onclick="window.app.openSearchModal()">🔍</button>
-                
-                <!-- زر الإعدادات يظهر للجميع الآن -->
                 <button class="action-btn" id="btn-settings" onclick="window.app.openSettings()">⚙️</button>
-                
                 <button class="action-btn" onclick="handleLogout()" style="color:red">↪️</button>
             </div>
         </div>
@@ -208,8 +190,8 @@
             <div class="modal-btns">
                 <button class="btn-save" onclick="window.app.saveDay()">حفظ</button>
                 <button class="btn-del" onclick="window.app.deleteDay()">مسح</button>
-                <button class="action-btn" onclick="document.getElementById('dayModal').style.display='none'">X</button>
             </div>
+            <button class="btn-close-modal" onclick="document.getElementById('dayModal').style.display='none'">إغلاق</button>
         </div>
     </div>
 
@@ -217,29 +199,37 @@
         <div class="modal-content">
             <h3 id="search-title" style="text-align:center;">بحث / تفاصيل</h3>
             <div id="search-inputs">
-                <select id="search-day-name" class="app-input" onchange="window.app.performSearch()">
-                    <option value="">-- اختر اليوم --</option><option value="0">الأحد</option><option value="1">الإثنين</option><option value="2">الثلاثاء</option>
-                    <option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option>
-                </select>
+                <label class="form-label">فلترة البحث:</label>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <select id="search-day-name" class="app-input" onchange="window.app.performSearch()">
+                        <option value="">-- كل الأيام --</option><option value="0">الأحد</option><option value="1">الإثنين</option><option value="2">الثلاثاء</option>
+                        <option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option>
+                    </select>
+                    <select id="search-type" class="app-input" onchange="window.app.performSearch()">
+                        <option value="">-- كل الحالات --</option>
+                        <option value="work">✅ عمل</option>
+                        <option value="holiday">🏖️ عطلة سنوية</option>
+                        <option value="sick">💊 مرض</option>
+                        <option value="eid">🎉 أعياد</option>
+                        <option value="recup">🔄 تعويض</option>
+                        <option value="absent">❌ غياب</option>
+                    </select>
+                </div>
             </div>
             <div id="search-results" style="max-height:400px; overflow-y:auto; margin-top:10px;"></div>
-            <div class="modal-btns"><button class="action-btn" onclick="document.getElementById('searchModal').style.display='none'">إغلاق</button></div>
+            <button class="btn-close-modal" onclick="document.getElementById('searchModal').style.display='none'">إغلاق</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <h3 style="text-align:center;">الإعدادات</h3>
-            
-            <!-- Global Presets (Admin Only) -->
             <div id="admin-section" style="display:none; background:#e3f2fd; padding:10px; border-radius:10px; margin-bottom:15px;">
                 <label class="form-label" style="color:#1565c0; font-weight:bold;">إدارة التوقيتات (للجميع):</label>
                 <div style="display:flex; gap:5px;"><input type="text" id="p-name" class="app-input" placeholder="اسم" style="width:30%"><input type="time" id="p-start" class="app-input" style="width:30%"><input type="time" id="p-end" class="app-input" style="width:30%"></div>
                 <button class="btn-main" onclick="window.app.addPreset()" style="font-size:0.8rem; padding:8px;">+ إضافة</button>
                 <div id="presets-list" class="preset-list" style="margin-top:10px; max-height:150px; overflow-y:auto;"></div>
             </div>
-
-            <!-- Personal Settings -->
             <div style="background:#e8f5e9; padding:10px; border-radius:10px; margin-bottom:15px;">
                 <label class="form-label">تاريخ التحاقي:</label><input type="date" id="s-join" class="app-input">
             </div>
@@ -251,8 +241,8 @@
             </div>
             <div class="modal-btns">
                 <button class="btn-save" onclick="window.app.saveSettings()">حفظ الكل</button>
-                <button class="action-btn" onclick="document.getElementById('settingsModal').style.display='none'">X</button>
             </div>
+            <button class="btn-close-modal" onclick="document.getElementById('settingsModal').style.display='none'">إغلاق</button>
         </div>
     </div>
 
@@ -276,7 +266,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // --- Auth Functions ---
+        // --- GLOBAL EXPORTS ---
         window.showLoader = (s) => document.getElementById('loader').style.display = s?'flex':'none';
         window.showError = (id, msg) => { const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; };
         window.switchView = (id) => {
@@ -286,6 +276,7 @@
         };
         window.togglePass = (id) => { const el=document.getElementById(id); el.type = el.type==='password'?'text':'password'; };
 
+        // --- Auth Logic ---
         window.handleLogin = async () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
@@ -302,7 +293,7 @@
                 }
             } catch(error) {
                 window.showLoader(false);
-                window.showError('login-error', "بيانات خاطئة");
+                window.showError('login-error', "بيانات خاطئة أو الحساب غير موجود");
             }
         };
 
@@ -334,7 +325,7 @@
             window.showLoader(true);
             try {
                 await sendPasswordResetEmail(auth, e);
-                document.getElementById('reset-msg').textContent = "تم الإرسال";
+                document.getElementById('reset-msg').textContent = "تم الإرسال، تفقد بريدك";
                 document.getElementById('reset-msg').style.display = 'block';
             } catch(err) { window.showError('reset-error', 'تأكد من الإيميل'); } finally { window.showLoader(false); }
         };
@@ -352,14 +343,11 @@
             } catch(e) { console.log(e); }
         };
 
-        // NEW: Specific delete function to fix issue
         window.removeEventFromFire = async (key) => {
             const u = auth.currentUser;
             if(!u) return;
             try {
-                await updateDoc(doc(db, 'attendance', u.uid), {
-                    [`events.${key}`]: deleteField()
-                });
+                await updateDoc(doc(db, 'attendance', u.uid), { [`events.${key}`]: deleteField() });
             } catch(e) { console.error("Delete failed", e); }
         };
 
@@ -368,8 +356,8 @@
                 document.getElementById('auth-overlay').style.display = 'none';
                 document.getElementById('app-container').style.display = 'block';
                 document.getElementById('u-name').textContent = user.email.split('@')[0];
-                
                 window.showLoader(true);
+                
                 const uDoc = await getDoc(doc(db, 'users', user.uid));
                 if(uDoc.exists()) {
                     window.appData.role = uDoc.data().role;
@@ -436,30 +424,23 @@
                     }
                     loopDate.setDate(loopDate.getDate() + 1);
                 }
-                if (changes) {
-                    window.saveData('events', window.appData.events);
-                }
+                if (changes) window.saveData('events', window.appData.events);
             },
 
             renderCalendar: () => {
                 const grid = document.getElementById('cal-grid');
                 grid.innerHTML = '';
                 dayNames.forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
-
                 const y = currentDate.getFullYear();
                 const m = currentDate.getMonth();
                 document.getElementById('cal-title').textContent = `${monthNames[m]} ${y}`;
-
                 const firstDay = new Date(y, m, 1).getDay();
                 const daysInMonth = new Date(y, m + 1, 0).getDate();
-
                 for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
-
                 for(let i=1; i<=daysInMonth; i++) {
                     const key = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                     const evt = window.appData.events[key];
                     let cls = '', txt = '';
-
                     if(evt) {
                         if(evt.type === 'work') { cls = 'st-work'; txt = evt.hours + 'س'; }
                         else if(evt.type === 'holiday') { cls = 'st-holiday'; txt = 'عطلة'; }
@@ -468,14 +449,8 @@
                         else if(evt.type === 'recup') { cls = 'st-recup'; txt = 'تعويض'; }
                         else if(evt.type === 'eid') { cls = 'st-eid'; txt = evt.eidName || 'عيد'; }
                     }
-
                     const todayClass = (new Date().toDateString() === new Date(y,m,i).toDateString()) ? 'today' : '';
-                    grid.innerHTML += `
-                        <div class="day-cell ${todayClass}" onclick="window.app.openDay('${key}')">
-                            <span>${i}</span>
-                            ${evt ? `<div class="day-badge ${cls}">${txt}</div>` : ''}
-                        </div>
-                    `;
+                    grid.innerHTML += `<div class="day-cell ${todayClass}" onclick="window.app.openDay('${key}')"><span>${i}</span>${evt ? `<div class="day-badge ${cls}">${txt}</div>` : ''}</div>`;
                 }
                 window.app.calcStats();
             },
@@ -486,22 +461,17 @@
                 selectedKey = key;
                 document.getElementById('modal-title').textContent = key;
                 document.getElementById('dayModal').style.display = 'flex';
-                
                 const evt = window.appData.events[key] || { type: 'work', start: '', end: '', eidStatus: 'work' };
                 document.getElementById('d-type').value = evt.type;
                 document.getElementById('d-start').value = evt.start || '';
                 document.getElementById('d-end').value = evt.end || '';
                 document.getElementById('d-eid-name').value = evt.eidName || '';
                 document.getElementById('d-count').value = 1;
-
                 const pre = document.getElementById('d-preset');
                 pre.innerHTML = '<option value="manual">-- اختر توقيت --</option>';
                 if(window.appData.global.presets) {
-                    window.appData.global.presets.forEach((p, i) => {
-                        pre.innerHTML += `<option value="${i}">${p.label} (${p.start}-${p.end})</option>`;
-                    });
+                    window.appData.global.presets.forEach((p, i) => { pre.innerHTML += `<option value="${i}">${p.label} (${p.start}-${p.end})</option>`; });
                 }
-
                 const rec = document.getElementById('d-recup-target');
                 rec.innerHTML = '<option value="">-- اختر يوماً --</option>';
                 const used = Object.values(window.appData.events).filter(e => e.type === 'recup').map(e => e.recupTarget);
@@ -585,7 +555,6 @@
             deleteDay: () => {
                 if(window.appData.events[selectedKey]) {
                     delete window.appData.events[selectedKey];
-                    // FIX: Call specific delete method
                     window.removeEventFromFire(selectedKey);
                 }
                 document.getElementById('dayModal').style.display = 'none';
@@ -597,15 +566,9 @@
                 const yr = currentDate.getFullYear();
                 const mth = currentDate.getMonth();
                 const today = new Date();
-                
-                const weekStart = new Date(today);
-                weekStart.setDate(today.getDate() - today.getDay());
-                weekStart.setHours(0,0,0,0);
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekStart.getDate() + 6);
-                weekEnd.setHours(23,59,59,999);
+                const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay()); weekStart.setHours(0,0,0,0);
+                const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
 
-                // Leave Balance
                 if(window.appData.personal.joinDate) {
                     const joinD = new Date(window.appData.personal.joinDate);
                     const joinY = joinD.getFullYear();
@@ -620,34 +583,27 @@
                     Object.values(window.appData.events).forEach(e => { if(e.type === 'holiday') leave--; });
                 }
 
-                // Day Loop
                 const startLoop = new Date(yr, 0, 1);
                 const limitLoop = (yr === today.getFullYear()) ? today : new Date(yr, 11, 31);
-
                 for (let d = new Date(startLoop); d <= limitLoop; d.setDate(d.getDate() + 1)) {
                     const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                     const evt = window.appData.events[k];
                     const dayNum = d.getDay();
-
                     if(dayNum === 6) {
                         if(evt && (evt.type === 'work' || (evt.type === 'eid' && evt.eidStatus === 'work'))) sat += 4;
                         else sat -= 4;
                     }
                 }
 
-                // Totals
                 for (const [k, evt] of Object.entries(window.appData.events)) {
                     const d = new Date(k);
                     if(d.getFullYear() !== yr) continue;
-
                     let effective = 0;
                     if(evt.type === 'work' || (evt.type === 'eid' && evt.eidStatus === 'work')) effective = evt.hours;
                     else if(['holiday','sick'].includes(evt.type) || (evt.type === 'eid' && evt.eidStatus === 'rest')) effective = 8;
-
                     tYear += effective;
                     if(d.getMonth() === mth) tMonth += effective;
                     if(d >= weekStart && d <= weekEnd) tWeek += effective;
-
                     if(evt.type === 'work' || (evt.type === 'eid' && evt.eidStatus === 'work')) net += (evt.hours - 8);
                     else if(evt.type === 'absent') net -= 8;
                 }
@@ -660,7 +616,6 @@
                         if(!used.includes(k)) pending++;
                     }
                 }
-
                 document.getElementById('st-net').innerHTML = `<span class="${net>=0?'txt-green':'txt-red'}">${net.toFixed(1)}</span>`;
                 document.getElementById('st-sat').innerHTML = `<span class="${sat>=0?'txt-green':'txt-red'}">${sat}</span>`;
                 document.getElementById('st-leave').textContent = leave.toFixed(1);
@@ -675,11 +630,10 @@
                 document.getElementById('search-title').textContent = 'التفاصيل';
                 const list = document.getElementById('search-results');
                 list.innerHTML = '';
-                
                 const yr = currentDate.getFullYear();
                 const today = new Date();
                 let tempList = [];
-
+                
                 if (cat === 'sat') {
                     const start = new Date(yr, 0, 1);
                     const limit = (yr === today.getFullYear()) ? today : new Date(yr, 11, 31);
@@ -703,20 +657,75 @@
                     }
                 }
                 else if (['week', 'month', 'year'].includes(cat)) {
+                    const mth = currentDate.getMonth();
+                    const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay()); weekStart.setHours(0,0,0,0);
+                    const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
+                    
                     for(const [k, evt] of Object.entries(window.appData.events)) {
-                        if(new Date(k).getFullYear() === yr) {
-                            let h = 0;
-                            if(evt.type==='work' || (evt.type==='eid' && evt.eidStatus==='work')) h = evt.hours;
-                            else if(['holiday','sick'].includes(evt.type)) h = 8;
-                            if(h>0) tempList.push({date:k, note:evt.type, val:h+'س', type:'pos'});
+                        const d = new Date(k);
+                        if(d.getFullYear() !== yr) continue;
+                        let valid = false;
+                        if(cat === 'year') valid = true;
+                        if(cat === 'month' && d.getMonth() === mth) valid = true;
+                        if(cat === 'week' && d >= weekStart && d <= weekEnd) valid = true;
+                        if(valid) {
+                            let hrs = 0;
+                            if(evt.type==='work' || (evt.type==='eid' && evt.eidStatus==='work')) hrs = evt.hours;
+                            else if(['holiday','sick'].includes(evt.type)) hrs = 8;
+                            if(hrs>0) tempList.push({date:k, note:evt.type, val:hrs+'س', type:'pos'});
+                        }
+                    }
+                }
+                // NEW: Sunday & Holidays Details
+                else if (cat === 'sunday') {
+                    const used = Object.values(window.appData.events).filter(e => e.type === 'recup').map(e => e.recupTarget);
+                    for(const [k, evt] of Object.entries(window.appData.events)) {
+                        const d = new Date(k);
+                        if ((d.getDay() === 0 && evt.type === 'work') || (evt.type === 'eid' && evt.eidStatus === 'work')) {
+                            const isUsed = used.includes(k);
+                            tempList.push({
+                                date: k,
+                                note: evt.eidName || 'عمل يوم أحد',
+                                val: isUsed ? 'تم التعويض' : 'مستحق',
+                                type: isUsed ? 'neutral' : 'pos'
+                            });
+                        }
+                    }
+                }
+                // NEW: Leave Balance Details
+                else if (cat === 'leave') {
+                    // 1. Entitlements
+                    if(window.appData.personal.joinDate) {
+                        const joinD = new Date(window.appData.personal.joinDate);
+                        const joinY = joinD.getFullYear();
+                        for(let y = 2026; y <= yr; y++) {
+                            let months = 12;
+                            if(y === joinY) months = 12 - joinD.getMonth();
+                            if(y < joinY) months = 0;
+                            let seniority = Math.floor((y - joinY)/5) * 1.5;
+                            const amount = Math.min((months * 1.5) + seniority, 30);
+                            tempList.push({date: `استحقاق ${y}`, note: `أقدمية ${(y-joinY)} سنة`, val: `+${amount}`, type: 'pos'});
+                        }
+                    }
+                    // 2. Adjustments
+                    (window.appData.personal.adjustments || []).forEach(adj => {
+                        tempList.push({date: 'رصيد إضافي', note: adj.reason, val: `+${adj.amount}`, type: 'pos'});
+                    });
+                    // 3. Taken
+                    for(const [k, evt] of Object.entries(window.appData.events)) {
+                        if(evt.type === 'holiday') {
+                            tempList.push({date: k, note: 'عطلة سنوية', val: '-1', type: 'neg'});
                         }
                     }
                 }
 
                 tempList.sort((a,b) => new Date(b.date) - new Date(a.date));
-                tempList.forEach(item => {
-                    list.innerHTML += `<div class="detail-item" onclick="window.app.openDay('${item.date}')"><span>${item.date} <small>(${item.note})</small></span><span class="d-val ${item.type}">${item.val}</span></div>`;
-                });
+                if(tempList.length === 0) list.innerHTML = '<div style="text-align:center; padding:10px;">لا توجد بيانات</div>';
+                else {
+                    tempList.forEach(item => {
+                        list.innerHTML += `<div class="detail-item ${item.type}" onclick="window.app.openDay('${item.date}')"><span>${item.date} <small>(${item.note})</small></span><span class="d-val ${item.type}">${item.val}</span></div>`;
+                    });
+                }
                 document.getElementById('searchModal').style.display = 'flex';
             },
 
@@ -728,17 +737,20 @@
             },
 
             performSearch: () => {
-                const dayIdx = parseInt(document.getElementById('search-day-name').value);
+                const dayVal = document.getElementById('search-day-name').value;
+                const typeVal = document.getElementById('search-type').value;
                 const list = document.getElementById('search-results');
                 list.innerHTML = '';
-                if(isNaN(dayIdx)) return;
-
+                if(dayVal === "" && typeVal === "") return;
                 const results = [];
                 for(let k in window.appData.events) {
-                    if(new Date(k).getDay() === dayIdx) results.push({date:k, ...window.appData.events[k]});
+                    const evt = window.appData.events[k];
+                    const d = new Date(k);
+                    let matchDay = (dayVal === "") || (d.getDay() == parseInt(dayVal));
+                    let matchType = (typeVal === "") || (evt.type === typeVal);
+                    if(matchDay && matchType) results.push({date:k, ...evt});
                 }
                 results.sort((a,b) => new Date(b.date) - new Date(a.date));
-
                 if(results.length === 0) list.innerHTML = '<div style="text-align:center; padding:10px;">لا توجد نتائج</div>';
                 else {
                     results.forEach(res => {
@@ -799,7 +811,6 @@
                         pl.innerHTML += `<div class="preset-item"><span>${p.label} (${p.start}-${p.end})</span> <span class="del-icon" onclick="window.app.delPreset(${i})">X</span></div>`;
                     });
                 }
-
                 const al = document.getElementById('adj-list');
                 al.innerHTML = '';
                 if(window.appData.personal.adjustments) {

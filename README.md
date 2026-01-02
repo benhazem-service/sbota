@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المدير الذكي 2026 (All Features)</title>
+    <title>المدير الذكي 2026 (Future Holidays)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -37,9 +37,7 @@
         .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.2rem; }
         .btn-main { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-secondary { background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
-        
         .btn-close-modal { width: 100%; padding: 12px; margin-top: 15px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        
         .error-msg { color: #d32f2f; display: none; background: #ffebee; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
         .success-msg { color: #2e7d32; display: none; background: #e8f5e9; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
         .view-section { display: none; } .view-section.active { display: block; animation: fadeIn 0.4s; }
@@ -48,13 +46,14 @@
         
         /* App Layout */
         #app-container { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .action-btn { background: #f0f2f5; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; position: relative; }
+        .header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; gap: 10px; }
+        .header-info { display: flex; flex-direction: column; min-width: 120px; }
+        .header-info h3 { margin: 0; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-actions { display: flex; gap: 8px; }
+        .action-btn { background: #f1f5f9; border: 1px solid #e2e8f0; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; color: #64748b; position: relative; }
+        .badge-count { position: absolute; top: -5px; left: -5px; background: #f44336; color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: none; justify-content: center; align-items: center; border: 2px solid white; }
 
-        /* Badge */
-        .badge-count { position: absolute; top: -5px; left: -5px; background: #f44336; color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; display: none; }
-
-        /* Stats & Calendar Styles */
+        /* Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         .stat-card { background: var(--surface); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); cursor: pointer; }
         .stat-card h4 { margin: 0; font-size: 0.75rem; color: var(--text-light); }
@@ -63,21 +62,60 @@
         .full-width { grid-column: span 2; }
         .txt-red { color: #f44336 !important; } .txt-green { color: #4caf50 !important; }
 
+        /* Calendar */
         .calendar-box { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-name { font-size: 0.75rem; color: var(--text-light); text-align: center; font-weight: bold; }
-        .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: #f8f9fa; cursor: pointer; position: relative; border: 1px solid transparent; }
-        .day-cell.today { border-color: var(--primary); background: #e3f2fd !important; }
         
-        /* Weekend Style (Lavender/Light Blue) */
+        /* Day Cells */
+        .day-cell { 
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
+            padding-top: 5px; border-radius: 10px; background: #f8f9fa; cursor: pointer; position: relative; border: 1px solid transparent; 
+        }
+        .day-cell span { font-weight: bold; font-size: 0.9rem; color: #444; z-index: 2; position: absolute; top: 4px; right: 6px; line-height: 1; }
+        
+        .day-cell.today { border: 2px solid var(--primary) !important; background: #e3f2fd !important; }
+        
+        /* Weekend */
         .day-cell.weekend { background-color: #E6E6FA; color: #4a4a4a; border: 1px dashed #d1c4e9; }
-
-        .day-badge { font-size: 0.6rem; margin-top: 2px; border-radius: 4px; padding: 1px 4px; color: white; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; }
         
-        .st-work { background: var(--work); } .st-holiday { background: var(--holiday); color: #333 !important; }
-        .st-sick { background: var(--sick); } .st-absent { background: var(--absent); }
-        .st-eid { background: var(--eid); } .st-recup { background: var(--recup); }
+        /* National Holiday */
+        .day-cell.nat-holiday { background-color: #fce4ec; border: 1px solid #f8bbd0; }
+        
+        /* Future Days */
+        .day-cell.future { opacity: 0.5; cursor: default; }
+        /* Allow clicking future national holidays */
+        .day-cell.nat-holiday.future { cursor: pointer; opacity: 0.8; }
+
+        /* Full Color Classes */
+        .day-cell.st-work { background-color: var(--work) !important; color: white !important; }
+        .day-cell.st-work span { color: white !important; }
+        .day-cell.st-holiday { background-color: var(--holiday) !important; color: #333 !important; }
+        .day-cell.st-holiday span { color: #333 !important; }
+        .day-cell.st-sick { background-color: var(--sick) !important; color: white !important; }
+        .day-cell.st-sick span { color: white !important; }
+        .day-cell.st-absent { background-color: var(--absent) !important; color: white !important; }
+        .day-cell.st-absent span { color: white !important; }
+        .day-cell.st-eid { background-color: var(--eid) !important; color: white !important; }
+        .day-cell.st-eid span { color: white !important; }
+        .day-cell.st-recup { background-color: var(--recup) !important; color: white !important; }
+        .day-cell.st-recup span { color: white !important; }
+
+        /* Legend */
+        .legend-container { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding: 10px; background: var(--surface); border-radius: var(--radius); }
+        .legend-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .lg-work { background-color: var(--work); }
+        .lg-holiday { background-color: var(--holiday); }
+        .lg-sick { background-color: var(--sick); }
+        .lg-absent { background-color: var(--absent); }
+        .lg-recup { background-color: var(--recup); }
+        .lg-eid { background-color: var(--eid); }
+        .lg-nat { background-color: #fce4ec; border: 2px solid #ec407a; }
+
+        #legend-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 3000; }
+        .show-toast { opacity: 1 !important; }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; justify-content: center; align-items: flex-end; }
@@ -100,7 +138,6 @@
         .del-icon { color: red; font-weight: bold; padding: 5px 10px; cursor: pointer; background: #fff; border-radius: 5px; }
         .d-val { font-weight: bold; direction: ltr; font-family: monospace; font-size: 1rem; }
         .d-val.pos { color: var(--work); } .d-val.neg { color: var(--absent); } .d-val.neutral { color: #666; }
-        
         .details-header { font-weight: bold; margin: 15px 0 10px; color: var(--primary-dark); font-size: 0.95rem; border-bottom: 2px solid #eee; padding-bottom: 5px; }
         .msg-popup-text { font-size: 1rem; color: #333; margin: 15px 0; background: #f9f9f9; padding: 15px; border-radius: 10px; border-right: 4px solid var(--primary); text-align: right; }
     </style>
@@ -108,6 +145,8 @@
 <body>
 
     <div id="loader" class="loading"><div style="width:40px;height:40px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin 1s infinite"></div></div>
+    
+    <div id="legend-toast"></div>
 
     <!-- Auth System -->
     <div id="auth-overlay">
@@ -144,15 +183,17 @@
     <!-- App -->
     <div id="app-container">
         <div class="header">
-            <div><h3 style="margin:0">مرحباً <span id="u-name"></span></h3><span id="u-role" style="font-size:0.8rem; color:#888;"></span></div>
-            <div style="display:flex; gap:10px">
-                <!-- Message Icon -->
+            <div class="header-info">
+                <h3>مرحباً، <span id="u-name" style="color:var(--primary)">...</span></h3>
+                <span id="u-role" style="font-size:0.75rem; color:#888;"></span>
+            </div>
+            <div class="header-actions">
                 <button class="action-btn" onclick="window.app.openInbox()">
                     🔔 <span id="msg-badge" class="badge-count">0</span>
                 </button>
                 <button class="action-btn" onclick="window.app.openSearchModal()">🔍</button>
                 <button class="action-btn" id="btn-settings" onclick="window.app.openSettings()">⚙️</button>
-                <button class="action-btn" onclick="handleLogout()" style="color:red">↪️</button>
+                <button class="action-btn logout-btn" onclick="handleLogout()" style="color:#ef4444; background:#fee2e2; border-color:#fca5a5;">↪️</button>
             </div>
         </div>
 
@@ -160,7 +201,7 @@
             <div class="stat-card" onclick="window.app.showDetails('net')"><h4>رصيد الساعات</h4><div class="val" id="st-net">0</div><div class="sub">ميزان (+/- 8س)</div></div>
             <div class="stat-card" onclick="window.app.showDetails('sat')"><h4>رصيد السبت</h4><div class="val" id="st-sat">0</div><div class="sub">عمل (+4) / آخر (-4)</div></div>
             <div class="stat-card" onclick="window.app.showDetails('sunday')"><h4>الأحد والأعياد</h4><div class="val" id="st-sunday">0</div><div class="sub">يوم تعويض</div></div>
-            <div class="stat-card" onclick="window.app.showDetails('leave')"><h4>رصيد العطلة</h4><div class="val" id="st-leave">0</div><div class="sub">متراكم من الأقدم</div></div>
+            <div class="stat-card" onclick="window.app.showDetails('leave')"><h4>رصيد العطلة</h4><div class="val" id="st-leave">0</div><div class="sub">تراكمي FIFO</div></div>
             <div class="stat-card" onclick="window.app.showDetails('week')"><h4>هذا الأسبوع</h4><div class="val" id="st-week">0</div></div>
             <div class="stat-card" onclick="window.app.showDetails('month')"><h4>هذا الشهر</h4><div class="val" id="st-month">0</div></div>
             <div class="stat-card full-width" onclick="window.app.showDetails('year')"><h4>مجموع السنة</h4><div class="val" id="st-year">0</div></div>
@@ -173,6 +214,16 @@
                 <button class="action-btn" onclick="window.app.navMonth(1)">&#10095;</button>
             </div>
             <div class="days-grid" id="cal-grid"></div>
+            
+            <div class="legend-container">
+                <div class="legend-dot lg-work" onclick="window.app.showLegendToast('عمل عادي')"></div>
+                <div class="legend-dot lg-holiday" onclick="window.app.showLegendToast('عطلة سنوية')"></div>
+                <div class="legend-dot lg-sick" onclick="window.app.showLegendToast('مرض')"></div>
+                <div class="legend-dot lg-absent" onclick="window.app.showLegendToast('غياب')"></div>
+                <div class="legend-dot lg-recup" onclick="window.app.showLegendToast('تعويض (Recuperation)')"></div>
+                <div class="legend-dot lg-eid" onclick="window.app.showLegendToast('عيد / مناسبة')"></div>
+                <div class="legend-dot lg-nat" onclick="window.app.showLegendToast('عيد وطني')"></div>
+            </div>
         </div>
     </div>
 
@@ -190,7 +241,7 @@
         </div>
     </div>
 
-    <!-- Live Message Popup -->
+    <!-- Msg Popup -->
     <div class="modal-overlay" id="msgPopup">
         <div class="modal-content">
             <h3 style="color:var(--primary); margin-bottom:10px;">📩 رسالة إدارية</h3>
@@ -199,7 +250,7 @@
         </div>
     </div>
 
-    <!-- Inbox Modal -->
+    <!-- Inbox -->
     <div class="modal-overlay" id="inboxModal">
         <div class="modal-content">
             <h3 style="text-align:center;">صندوق الرسائل</h3>
@@ -208,7 +259,7 @@
         </div>
     </div>
 
-    <!-- Day Modal -->
+    <!-- Day Edit -->
     <div class="modal-overlay" id="dayModal">
         <div class="modal-content">
             <h3 id="modal-title" style="text-align:center; margin-bottom:20px;"></h3>
@@ -232,7 +283,7 @@
         </div>
     </div>
 
-    <!-- Search Modal -->
+    <!-- Search -->
     <div class="modal-overlay" id="searchModal">
         <div class="modal-content">
             <h3 id="search-title" style="text-align:center;">بحث / تفاصيل</h3>
@@ -254,12 +305,11 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Settings -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <h3 style="text-align:center;">الإعدادات</h3>
             
-            <!-- Admin Only: Send & Manage Presets -->
             <div id="admin-section" style="display:none; margin-bottom:15px;">
                 <div style="background:#fff3e0; padding:10px; border-radius:10px; border:1px solid #ffcc80; margin-bottom:15px;">
                     <label class="form-label" style="color:#ef6c00; font-weight:bold;">✉️ إرسال رسالة للموظفين:</label>
@@ -310,7 +360,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Global Funcs
+        // --- GLOBAL EXPORTS ---
         window.showLoader = (s) => document.getElementById('loader').style.display = s?'flex':'none';
         window.showError = (id, msg) => { const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; };
         window.switchView = (id) => {
@@ -320,7 +370,6 @@
         };
         window.togglePass = (id) => { const el=document.getElementById(id); el.type = el.type==='password'?'text':'password'; };
 
-        // --- AUTH ---
         window.handleLogin = async () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
@@ -376,7 +425,6 @@
 
         window.handleLogout = async () => { await signOut(auth); window.location.reload(); };
 
-        // --- DATA & MESSAGES ---
         window.saveData = async (type, data) => {
             const u = auth.currentUser;
             if(!u) return;
@@ -421,7 +469,7 @@
                     if(window.appData.role === 'admin') document.getElementById('admin-section').style.display = 'block';
                 }
 
-                // Snapshots
+                // Listeners
                 onSnapshot(doc(db, "attendance", user.uid), (doc) => {
                     if(doc.exists()) window.appData.events = doc.data().events || {};
                     window.app.renderCalendar();
@@ -429,6 +477,7 @@
                 });
                 onSnapshot(doc(db, "settings", user.uid), (doc) => {
                     if(doc.exists()) window.appData.personal = doc.data() || {joinDate:'', fullName:'', adjustments:[], dismissedMsgs:[], deletedMsgs:[]};
+                    // Ensure arrays exist
                     if(!window.appData.personal.dismissedMsgs) window.appData.personal.dismissedMsgs = [];
                     if(!window.appData.personal.deletedMsgs) window.appData.personal.deletedMsgs = [];
                     
@@ -462,6 +511,7 @@
 
     <!-- App Logic -->
     <script>
+        const nationalHolidays = { "1-11":"وثيقة الاستقلال","1-14":"رأس السنة الأمازيغية","5-1":"عيد الشغل","7-30":"عيد العرش","8-14":"وادي الذهب","8-20":"ثورة الملك والشعب","8-21":"عيد الشباب","10-31":"عيد الوحدة","11-6":"المسيرة الخضراء","11-18":"عيد الاستقلال","12-9":"عيد الوساطة" };
         const dayNames = ["إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت", "أحد"];
         const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         let currentDate = new Date(2026, 0, 1);
@@ -544,24 +594,53 @@
                 }
             },
 
+            // --- Legend Toast ---
+            showLegendToast: (msg) => {
+                const toast = document.getElementById('legend-toast');
+                toast.textContent = msg;
+                toast.classList.add('show-toast');
+                setTimeout(() => toast.classList.remove('show-toast'), 3000);
+            },
+
             // Calendar
             checkAutoFill: () => {
                 const today = new Date(); today.setHours(0,0,0,0);
                 let startCheck = new Date(2026, 0, 1);
                 if (today < startCheck) return;
-                let defStart='08:00', defEnd='16:00';
+                
+                // Get Last Saved Time (Memory Feature)
+                let lastStart = '08:00';
+                let lastEnd = '16:00';
                 if(window.appData.global.presets && window.appData.global.presets.length > 0) {
-                    defStart = window.appData.global.presets[0].start;
-                    defEnd = window.appData.global.presets[0].end;
+                    lastStart = window.appData.global.presets[0].start;
+                    lastEnd = window.appData.global.presets[0].end;
                 }
+
                 let changes = false;
                 let loopDate = new Date(startCheck);
+
                 while (loopDate < today) {
-                    const dNum = loopDate.getDay();
-                    if (dNum !== 0 && dNum !== 6) {
-                        const k = `${loopDate.getFullYear()}-${String(loopDate.getMonth()+1).padStart(2,'0')}-${String(loopDate.getDate()).padStart(2,'0')}`;
-                        if (!window.appData.events[k]) {
-                            window.appData.events[k] = { type:'work', start:defStart, end:defEnd, hours:8, autoFilled:true };
+                    const k = `${loopDate.getFullYear()}-${String(loopDate.getMonth()+1).padStart(2,'0')}-${String(loopDate.getDate()).padStart(2,'0')}`;
+                    const evt = window.appData.events[k];
+                    
+                    // 1. If exists and is work, update memory
+                    if (evt && evt.type === 'work' && evt.start && evt.end) {
+                        lastStart = evt.start;
+                        lastEnd = evt.end;
+                    }
+                    // 2. If missing and is work day (Mon-Fri), auto-fill using memory
+                    else if (!evt) {
+                        const dNum = loopDate.getDay();
+                        if (dNum !== 0 && dNum !== 6) {
+                            const [h1, m1] = lastStart.split(':').map(Number);
+                            const [h2, m2] = lastEnd.split(':').map(Number);
+                            let diff = (h2*60+m2) - (h1*60+m1);
+                            if(diff < 0) diff += 24*60;
+                            const hrs = parseFloat((diff/60).toFixed(2));
+
+                            window.appData.events[k] = { 
+                                type: 'work', start: lastStart, end: lastEnd, hours: hrs, autoFilled: true 
+                            };
                             changes = true;
                         }
                     }
@@ -581,23 +660,47 @@
                 firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
                 const daysInMonth = new Date(y, m + 1, 0).getDate();
                 for(let i=0; i<firstDayIndex; i++) grid.innerHTML += `<div></div>`;
+                
                 for(let i=1; i<=daysInMonth; i++) {
                     const key = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                     const evt = window.appData.events[key];
                     let cls = '', txt = '';
+                    
+                    const natKey = `${m+1}-${i}`;
+                    const isNat = nationalHolidays[natKey];
+                    let natClass = '';
+
                     if(evt) {
-                        if(evt.type === 'work') { cls = 'st-work'; txt = evt.hours + 'س'; }
-                        else if(evt.type === 'holiday') { cls = 'st-holiday'; txt = 'عطلة'; }
-                        else if(evt.type === 'sick') { cls = 'st-sick'; txt = 'مرض'; }
-                        else if(evt.type === 'absent') { cls = 'st-absent'; txt = 'غياب'; }
-                        else if(evt.type === 'recup') { cls = 'st-recup'; txt = 'تعويض'; }
-                        else if(evt.type === 'eid') { cls = 'st-eid'; txt = evt.eidName || 'عيد'; }
+                        if(evt.type === 'work') { cls = 'st-work'; txt = ''; } 
+                        else if(evt.type === 'holiday') { cls = 'st-holiday'; }
+                        else if(evt.type === 'sick') { cls = 'st-sick'; }
+                        else if(evt.type === 'absent') { cls = 'st-absent'; }
+                        else if(evt.type === 'recup') { cls = 'st-recup'; }
+                        else if(evt.type === 'eid') { cls = 'st-eid'; }
+                    } else if (isNat) {
+                        natClass = 'nat-holiday';
                     }
+
                     const currentLoopDate = new Date(y, m, i);
+                    const now = new Date();
+                    now.setHours(0,0,0,0);
+                    const isFuture = currentLoopDate > now;
+                    
                     const isWeekend = (currentLoopDate.getDay() === 0 || currentLoopDate.getDay() === 6);
                     const weekendClass = isWeekend ? 'weekend' : '';
                     const todayClass = (new Date().toDateString() === new Date(y,m,i).toDateString()) ? 'today' : '';
-                    grid.innerHTML += `<div class="day-cell ${todayClass} ${weekendClass}" onclick="window.app.openDay('${key}')"><span>${i}</span>${evt ? `<div class="day-badge ${cls}">${txt}</div>` : ''}</div>`;
+                    
+                    const futureClass = isFuture ? 'future' : '';
+                    
+                    // Allow clicking future IF it is national holiday
+                    const isClickable = !isFuture || isNat;
+                    const clickAction = isClickable ? `onclick="window.app.openDay('${key}')"` : '';
+
+                    grid.innerHTML += `
+                        <div class="day-cell ${todayClass} ${weekendClass} ${natClass} ${cls} ${futureClass}" ${clickAction}>
+                            <span>${i}</span>
+                        </div>
+                    `;
                 }
                 window.app.calcStats();
             },
@@ -605,15 +708,37 @@
             navMonth: (s) => { currentDate.setMonth(currentDate.getMonth() + s); window.app.renderCalendar(); },
 
             openDay: (key) => {
+                const dateObj = new Date(key);
+                const hKey = `${dateObj.getMonth()+1}-${dateObj.getDate()}`;
+                const natName = nationalHolidays[hKey];
+                
+                // Allow if not future OR is national holiday
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if(new Date(key) > today && !natName) return;
+
                 selectedKey = key;
                 document.getElementById('modal-title').textContent = key;
                 document.getElementById('dayModal').style.display = 'flex';
-                const evt = window.appData.events[key] || { type: 'work', start: '', end: '', eidStatus: 'work' };
+                
+                let evt = window.appData.events[key];
+                
+                // Pre-fill if national holiday and not set
+                if (!evt && natName) {
+                    evt = { type: 'eid', eidStatus: 'rest', eidName: natName };
+                } else if (!evt) {
+                    evt = { type: 'work', start: '', end: '', eidStatus: 'work' };
+                }
+
                 document.getElementById('d-type').value = evt.type;
                 document.getElementById('d-start').value = evt.start || '';
                 document.getElementById('d-end').value = evt.end || '';
                 document.getElementById('d-eid-name').value = evt.eidName || '';
                 document.getElementById('d-count').value = 1;
+                
+                if(natName && !window.appData.events[key]) document.getElementById('d-eid-status').value = 'rest';
+                else document.getElementById('d-eid-status').value = evt.eidStatus || 'work';
+
                 const pre = document.getElementById('d-preset');
                 pre.innerHTML = '<option value="manual">-- اختر توقيت --</option>';
                 if(window.appData.global.presets) {
@@ -659,6 +784,7 @@
             saveDay: () => {
                 const type = document.getElementById('d-type').value;
                 let targetKey = selectedKey;
+
                 if(type === 'holiday') {
                     let count = parseInt(document.getElementById('d-count').value);
                     let loopD = new Date(selectedKey);
@@ -719,7 +845,7 @@
                 window.app.renderCalendar();
             },
 
-            // Logic Hub
+            // --- Logic Hub ---
             getLeaveBreakdown: () => {
                 const currentY = new Date(2026, 0, 1).getFullYear();
                 const joinDateStr = window.appData.personal.joinDate;
@@ -993,6 +1119,14 @@
                 window.saveData('personal_settings', window.appData.personal);
                 if(window.appData.role === 'admin') window.saveData('global_config', window.appData.global);
                 document.getElementById('settingsModal').style.display = 'none';
+            },
+
+            // --- Legend Toast ---
+            showLegendToast: (msg) => {
+                const toast = document.getElementById('legend-toast');
+                toast.textContent = msg;
+                toast.classList.add('show-toast');
+                setTimeout(() => toast.classList.remove('show-toast'), 3000);
             }
         };
     </script>

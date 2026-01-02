@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المدير الذكي 2026 (Future Holidays)</title>
+    <title>المدير الذكي 2026 (Fix Today)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -75,30 +75,49 @@
         }
         .day-cell span { font-weight: bold; font-size: 0.9rem; color: #444; z-index: 2; position: absolute; top: 4px; right: 6px; line-height: 1; }
         
+        /* Today */
         .day-cell.today { border: 2px solid var(--primary) !important; background: #e3f2fd !important; }
         
-        /* Weekend */
+        /* Weekend Style (Lavender) */
         .day-cell.weekend { background-color: #E6E6FA; color: #4a4a4a; border: 1px dashed #d1c4e9; }
         
-        /* National Holiday */
-        .day-cell.nat-holiday { background-color: #fce4ec; border: 1px solid #f8bbd0; }
-        
+        /* National Holiday (Frame Only) */
+        .day-cell.nat-holiday { background-color: transparent !important; border: 2px solid #ec407a !important; }
+
         /* Future Days */
-        .day-cell.future { opacity: 0.5; cursor: default; }
-        /* Allow clicking future national holidays */
-        .day-cell.nat-holiday.future { cursor: pointer; opacity: 0.8; }
+        .day-cell.future { opacity: 0.5; cursor: default; background: #f0f0f0 !important; border: 1px solid #eee !important; color: #ccc !important; }
+        
+        /* Future Weekend (Frame Only) */
+        .day-cell.weekend.future {
+            background-color: transparent !important;
+            border: 2px solid #b39ddb !important; /* إطار بنفسجي للعطل الأسبوعية القادمة */
+            opacity: 0.6;
+        }
+
+        /* Future Nat Holiday (Frame Only) */
+        .day-cell.nat-holiday.future {
+            background-color: transparent !important;
+            border: 2px solid #ec407a !important; /* إطار وردي */
+            cursor: pointer;
+            opacity: 1;
+        }
 
         /* Full Color Classes */
         .day-cell.st-work { background-color: var(--work) !important; color: white !important; }
         .day-cell.st-work span { color: white !important; }
+
         .day-cell.st-holiday { background-color: var(--holiday) !important; color: #333 !important; }
         .day-cell.st-holiday span { color: #333 !important; }
+
         .day-cell.st-sick { background-color: var(--sick) !important; color: white !important; }
         .day-cell.st-sick span { color: white !important; }
+
         .day-cell.st-absent { background-color: var(--absent) !important; color: white !important; }
         .day-cell.st-absent span { color: white !important; }
+
         .day-cell.st-eid { background-color: var(--eid) !important; color: white !important; }
         .day-cell.st-eid span { color: white !important; }
+
         .day-cell.st-recup { background-color: var(--recup) !important; color: white !important; }
         .day-cell.st-recup span { color: white !important; }
 
@@ -112,7 +131,7 @@
         .lg-absent { background-color: var(--absent); }
         .lg-recup { background-color: var(--recup); }
         .lg-eid { background-color: var(--eid); }
-        .lg-nat { background-color: #fce4ec; border: 2px solid #ec407a; }
+        .lg-nat { background-color: transparent; border: 2px solid #ec407a; }
 
         #legend-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 3000; }
         .show-toast { opacity: 1 !important; }
@@ -681,18 +700,25 @@
                         natClass = 'nat-holiday';
                     }
 
-                    const currentLoopDate = new Date(y, m, i);
-                    const now = new Date();
-                    now.setHours(0,0,0,0);
-                    const isFuture = currentLoopDate > now;
+                    // Strict Date Comparison for "Is Future"
+                    // Create normalized dates (00:00:00)
+                    const loopDate = new Date(y, m, i);
+                    loopDate.setHours(0,0,0,0);
                     
-                    const isWeekend = (currentLoopDate.getDay() === 0 || currentLoopDate.getDay() === 6);
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+
+                    const isFuture = loopDate > today;
+                    
+                    const isWeekend = (loopDate.getDay() === 0 || loopDate.getDay() === 6);
                     const weekendClass = isWeekend ? 'weekend' : '';
-                    const todayClass = (new Date().toDateString() === new Date(y,m,i).toDateString()) ? 'today' : '';
+                    
+                    const isToday = loopDate.getTime() === today.getTime();
+                    const todayClass = isToday ? 'today' : '';
                     
                     const futureClass = isFuture ? 'future' : '';
                     
-                    // Allow clicking future IF it is national holiday
+                    // Allow click if: (Not Future) OR (Is Future AND Is National Holiday)
                     const isClickable = !isFuture || isNat;
                     const clickAction = isClickable ? `onclick="window.app.openDay('${key}')"` : '';
 
@@ -709,13 +735,15 @@
 
             openDay: (key) => {
                 const dateObj = new Date(key);
+                dateObj.setHours(0,0,0,0);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
                 const hKey = `${dateObj.getMonth()+1}-${dateObj.getDate()}`;
                 const natName = nationalHolidays[hKey];
                 
                 // Allow if not future OR is national holiday
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                if(new Date(key) > today && !natName) return;
+                if(dateObj > today && !natName) return;
 
                 selectedKey = key;
                 document.getElementById('modal-title').textContent = key;

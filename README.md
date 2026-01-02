@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المدير الذكي 2026 (FIFO System)</title>
+    <title>المدير الذكي 2026 (All Features)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -19,9 +19,17 @@
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Cairo', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 80px; color: var(--text); }
 
-        /* Auth Screen */
-        #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), #4cc9f0); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        .auth-card { background: rgba(255,255,255,0.98); padding: 30px; border-radius: 24px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        /* Auth Screen Styles */
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary), #4cc9f0);
+            z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .auth-card {
+            background: rgba(255,255,255,0.98); padding: 30px; border-radius: 24px;
+            width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
         .auth-header h2 { color: var(--primary-dark); margin: 0 0 10px 0; }
         .input-group { position: relative; margin-bottom: 15px; }
         .app-input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-family: inherit; font-size: 1rem; outline: none; transition: 0.3s; }
@@ -29,19 +37,24 @@
         .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.2rem; }
         .btn-main { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-secondary { background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
-        .btn-close-modal { width: 100%; padding: 12px; margin-top: 15px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: bold; font-family: 'Cairo', sans-serif; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        
+        .btn-close-modal { width: 100%; padding: 12px; margin-top: 15px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        
         .error-msg { color: #d32f2f; display: none; background: #ffebee; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
         .success-msg { color: #2e7d32; display: none; background: #e8f5e9; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
         .view-section { display: none; } .view-section.active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:10000; display:none; justify-content:center; align-items:center; }
-
+        
         /* App Layout */
         #app-container { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .action-btn { background: #f0f2f5; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
+        .action-btn { background: #f0f2f5; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; position: relative; }
 
-        /* Stats */
+        /* Badge */
+        .badge-count { position: absolute; top: -5px; left: -5px; background: #f44336; color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; display: none; }
+
+        /* Stats & Calendar Styles */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         .stat-card { background: var(--surface); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); cursor: pointer; }
         .stat-card h4 { margin: 0; font-size: 0.75rem; color: var(--text-light); }
@@ -50,13 +63,16 @@
         .full-width { grid-column: span 2; }
         .txt-red { color: #f44336 !important; } .txt-green { color: #4caf50 !important; }
 
-        /* Calendar */
         .calendar-box { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-name { font-size: 0.75rem; color: var(--text-light); text-align: center; font-weight: bold; }
-        .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: #f8f9fa; cursor: pointer; border: 1px solid transparent; position: relative; }
-        .day-cell.today { border-color: var(--primary); background: #e3f2fd; }
+        .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: #f8f9fa; cursor: pointer; position: relative; border: 1px solid transparent; }
+        .day-cell.today { border-color: var(--primary); background: #e3f2fd !important; }
+        
+        /* Weekend Style (Lavender/Light Blue) */
+        .day-cell.weekend { background-color: #E6E6FA; color: #4a4a4a; border: 1px dashed #d1c4e9; }
+
         .day-badge { font-size: 0.6rem; margin-top: 2px; border-radius: 4px; padding: 1px 4px; color: white; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; }
         
         .st-work { background: var(--work); } .st-holiday { background: var(--holiday); color: #333 !important; }
@@ -65,7 +81,9 @@
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; justify-content: center; align-items: flex-end; }
+        #confirmModal, #msgPopup { z-index: 99999 !important; align-items: center; } 
         .modal-content { background: var(--surface); width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 25px; animation: slideUp 0.3s; max-height: 85vh; overflow-y: auto; }
+        #confirmModal .modal-content, #msgPopup .modal-content { border-radius: 24px; max-width: 320px; text-align: center; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
         .btn-save { background: var(--primary); color: white; flex: 2; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
@@ -73,20 +91,25 @@
         .hidden { display: none; }
         
         /* Lists */
-        .preset-item, .search-item, .detail-item { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 10px; margin-bottom: 6px; font-size: 0.9rem; border-left: 4px solid transparent; }
+        .preset-item, .search-item, .detail-item, .msg-item { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 10px; margin-bottom: 6px; font-size: 0.9rem; border-left: 4px solid transparent; }
         .detail-item.pos { border-left-color: var(--work); } .detail-item.neg { border-left-color: var(--absent); } .detail-item.neutral { border-left-color: var(--primary); }
+        .msg-item { border-left-color: #ff9800; background: #fff8e1; flex-direction: column; align-items: flex-start; gap: 8px; }
+        .msg-item .msg-body { font-size: 0.9rem; color: #333; }
+        .msg-item .msg-footer { width: 100%; display: flex; justify-content: space-between; font-size: 0.7rem; color: #888; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 5px; }
+
         .del-icon { color: red; font-weight: bold; padding: 5px 10px; cursor: pointer; background: #fff; border-radius: 5px; }
         .d-val { font-weight: bold; direction: ltr; font-family: monospace; font-size: 1rem; }
         .d-val.pos { color: var(--work); } .d-val.neg { color: var(--absent); } .d-val.neutral { color: #666; }
         
         .details-header { font-weight: bold; margin: 15px 0 10px; color: var(--primary-dark); font-size: 0.95rem; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .msg-popup-text { font-size: 1rem; color: #333; margin: 15px 0; background: #f9f9f9; padding: 15px; border-radius: 10px; border-right: 4px solid var(--primary); text-align: right; }
     </style>
 </head>
 <body>
 
     <div id="loader" class="loading"><div style="width:40px;height:40px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin 1s infinite"></div></div>
 
-    <!-- Auth -->
+    <!-- Auth System -->
     <div id="auth-overlay">
         <div class="auth-card">
             <div id="view-login" class="view-section active">
@@ -123,6 +146,10 @@
         <div class="header">
             <div><h3 style="margin:0">مرحباً <span id="u-name"></span></h3><span id="u-role" style="font-size:0.8rem; color:#888;"></span></div>
             <div style="display:flex; gap:10px">
+                <!-- Message Icon -->
+                <button class="action-btn" onclick="window.app.openInbox()">
+                    🔔 <span id="msg-badge" class="badge-count">0</span>
+                </button>
                 <button class="action-btn" onclick="window.app.openSearchModal()">🔍</button>
                 <button class="action-btn" id="btn-settings" onclick="window.app.openSettings()">⚙️</button>
                 <button class="action-btn" onclick="handleLogout()" style="color:red">↪️</button>
@@ -149,6 +176,38 @@
         </div>
     </div>
 
+    <!-- Modals -->
+    
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content">
+            <h3 style="color:#f44336; margin-bottom:10px;">⚠️ تأكيد الحذف</h3>
+            <p style="color:#666; margin-bottom:20px;">هل أنت متأكد من مسح تسجيل هذا اليوم نهائياً؟</p>
+            <div class="modal-btns">
+                <button class="btn-del" onclick="window.app.performDelete()">نعم، احذف</button>
+                <button class="btn-save" style="background:#e0e0e0; color:#333;" onclick="document.getElementById('confirmModal').style.display='none'">تراجع</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Message Popup -->
+    <div class="modal-overlay" id="msgPopup">
+        <div class="modal-content">
+            <h3 style="color:var(--primary); margin-bottom:10px;">📩 رسالة إدارية</h3>
+            <div id="live-msg-content" class="msg-popup-text"></div>
+            <button class="btn-save" onclick="window.app.dismissMessage()">قراءة وإخفاء</button>
+        </div>
+    </div>
+
+    <!-- Inbox Modal -->
+    <div class="modal-overlay" id="inboxModal">
+        <div class="modal-content">
+            <h3 style="text-align:center;">صندوق الرسائل</h3>
+            <div id="inbox-list" style="margin-top:15px; max-height:400px; overflow-y:auto;"></div>
+            <button class="btn-close-modal" onclick="document.getElementById('inboxModal').style.display='none'">إغلاق</button>
+        </div>
+    </div>
+
     <!-- Day Modal -->
     <div class="modal-overlay" id="dayModal">
         <div class="modal-content">
@@ -167,7 +226,7 @@
             </div>
             <div class="modal-btns">
                 <button class="btn-save" onclick="window.app.saveDay()">حفظ</button>
-                <button class="btn-del" onclick="window.app.deleteDay()">مسح</button>
+                <button class="btn-del" onclick="window.app.askDelete()">مسح</button>
             </div>
             <button class="btn-close-modal" onclick="document.getElementById('dayModal').style.display='none'">إغلاق</button>
         </div>
@@ -181,11 +240,12 @@
                 <label class="form-label">فلترة البحث:</label>
                 <div style="display:flex; gap:5px; margin-bottom:10px;">
                     <select id="search-day-name" class="app-input" onchange="window.app.performSearch()">
-                        <option value="">-- كل الأيام --</option><option value="0">الأحد</option><option value="1">الإثنين</option><option value="2">الثلاثاء</option>
-                        <option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option>
+                        <option value="">-- كل الأيام --</option><option value="1">الإثنين</option><option value="2">الثلاثاء</option><option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option><option value="0">الأحد</option>
                     </select>
                     <select id="search-type" class="app-input" onchange="window.app.performSearch()">
-                        <option value="">-- كل الحالات --</option><option value="work">✅ عمل</option><option value="holiday">🏖️ عطلة</option><option value="sick">💊 مرض</option><option value="eid">🎉 أعياد</option><option value="recup">🔄 تعويض</option><option value="absent">❌ غياب</option>
+                        <option value="">-- كل الحالات --</option>
+                        <option value="work">✅ عمل</option><option value="holiday">🏖️ عطلة</option><option value="sick">💊 مرض</option>
+                        <option value="eid">🎉 أعياد</option><option value="recup">🔄 تعويض</option><option value="absent">❌ غياب</option>
                     </select>
                 </div>
             </div>
@@ -198,18 +258,30 @@
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <h3 style="text-align:center;">الإعدادات</h3>
-            <div id="admin-section" style="display:none; background:#e3f2fd; padding:10px; border-radius:10px; margin-bottom:15px;">
-                <label class="form-label" style="color:#1565c0; font-weight:bold;">إدارة التوقيتات (للجميع):</label>
-                <div style="display:flex; gap:5px;"><input type="text" id="p-name" class="app-input" placeholder="اسم" style="width:30%"><input type="time" id="p-start" class="app-input" style="width:30%"><input type="time" id="p-end" class="app-input" style="width:30%"></div>
-                <button class="btn-main" onclick="window.app.addPreset()" style="font-size:0.8rem; padding:8px;">+ إضافة</button>
-                <div id="presets-list" class="preset-list" style="margin-top:10px; max-height:150px; overflow-y:auto;"></div>
+            
+            <!-- Admin Only: Send & Manage Presets -->
+            <div id="admin-section" style="display:none; margin-bottom:15px;">
+                <div style="background:#fff3e0; padding:10px; border-radius:10px; border:1px solid #ffcc80; margin-bottom:15px;">
+                    <label class="form-label" style="color:#ef6c00; font-weight:bold;">✉️ إرسال رسالة للموظفين:</label>
+                    <textarea id="admin-msg-text" class="app-input" rows="2" placeholder="اكتب الرسالة هنا..."></textarea>
+                    <button class="btn-main" style="background:#ff9800; margin-top:0;" onclick="window.app.sendBroadcast()">إرسال للكل</button>
+                </div>
+
+                <div style="background:#e3f2fd; padding:10px; border-radius:10px;">
+                    <label class="form-label" style="color:#1565c0; font-weight:bold;">إدارة التوقيتات:</label>
+                    <div style="display:flex; gap:5px;"><input type="text" id="p-name" class="app-input" placeholder="اسم" style="width:30%"><input type="time" id="p-start" class="app-input" style="width:30%"><input type="time" id="p-end" class="app-input" style="width:30%"></div>
+                    <button class="btn-main" onclick="window.app.addPreset()" style="font-size:0.8rem; padding:8px;">+ إضافة</button>
+                    <div id="presets-list" class="preset-list" style="margin-top:10px; max-height:100px; overflow-y:auto;"></div>
+                </div>
             </div>
+
             <div style="background:#e8f5e9; padding:10px; border-radius:10px; margin-bottom:15px;">
+                <label class="form-label">الاسم الكامل:</label><input type="text" id="s-name" class="app-input" placeholder="اسم الموظف">
                 <label class="form-label">تاريخ التحاقي:</label><input type="date" id="s-join" class="app-input">
             </div>
             <div style="background:#fff3e0; padding:10px; border-radius:10px; margin-bottom:15px;">
-                <label class="form-label">رصيد عطلة إضافي (أيام سابقة):</label>
-                <div style="display:flex; gap:5px;"><input type="number" id="adj-days" class="app-input" placeholder="أيام"><input type="text" id="adj-note" class="app-input" placeholder="مثلاً: رصيد 2025"></div>
+                <label class="form-label">رصيد عطلة إضافي:</label>
+                <div style="display:flex; gap:5px;"><input type="number" id="adj-days" class="app-input" placeholder="أيام"><input type="text" id="adj-note" class="app-input" placeholder="سبب"></div>
                 <button class="btn-main" onclick="window.app.addAdj()" style="background:#ff9800; font-size:0.8rem; padding:8px;">+ إضافة</button>
                 <div id="adj-list" style="margin-top:10px;"></div>
             </div>
@@ -221,7 +293,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, updateDoc, deleteField, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, sendEmailVerification, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -238,7 +310,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // --- GLOBAL EXPORTS ---
+        // Global Funcs
         window.showLoader = (s) => document.getElementById('loader').style.display = s?'flex':'none';
         window.showError = (id, msg) => { const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; };
         window.switchView = (id) => {
@@ -248,6 +320,7 @@
         };
         window.togglePass = (id) => { const el=document.getElementById(id); el.type = el.type==='password'?'text':'password'; };
 
+        // --- AUTH ---
         window.handleLogin = async () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
@@ -282,7 +355,7 @@
                 const cred = await createUserWithEmailAndPassword(auth, e, p);
                 await sendEmailVerification(cred.user);
                 await setDoc(doc(db, "users", cred.user.uid), { email: e, role: role });
-                await setDoc(doc(db, "settings", cred.user.uid), { joinDate: '', adjustments: [] });
+                await setDoc(doc(db, "settings", cred.user.uid), { joinDate: '', fullName: '', adjustments: [], dismissedMsgs: [], deletedMsgs: [] });
                 if(role === 'admin') await setDoc(doc(db, "config", "general"), { presets: [{label:'عادي', start:'08:00', end:'16:00'}] });
                 await signOut(auth);
                 document.getElementById('reg-success').textContent = "تم التسجيل! راجع بريدك للتفعيل.";
@@ -303,6 +376,7 @@
 
         window.handleLogout = async () => { await signOut(auth); window.location.reload(); };
 
+        // --- DATA & MESSAGES ---
         window.saveData = async (type, data) => {
             const u = auth.currentUser;
             if(!u) return;
@@ -313,12 +387,25 @@
             } catch(e) { console.log(e); }
         };
 
-        window.removeEventFromFire = async (key) => {
+        window.fbDeleteDay = async (dateKey) => {
             const u = auth.currentUser;
             if(!u) return;
             try {
-                await updateDoc(doc(db, 'attendance', u.uid), { [`events.${key}`]: deleteField() });
-            } catch(e) { console.error("Delete failed", e); }
+                await updateDoc(doc(db, 'attendance', u.uid), { [`events.${dateKey}`]: deleteField() });
+            } catch(e) { console.error("Error deleting:", e); }
+        };
+
+        window.sendAdminMessage = async (text) => {
+            const u = auth.currentUser;
+            if(!u) return;
+            try {
+                await addDoc(collection(db, "notifications"), {
+                    content: text,
+                    createdAt: serverTimestamp(),
+                    sender: u.uid
+                });
+                alert("تم إرسال الرسالة بنجاح!");
+            } catch(e) { alert("خطأ في الإرسال"); }
         };
 
         onAuthStateChanged(auth, async (user) => {
@@ -331,22 +418,38 @@
                 const uDoc = await getDoc(doc(db, 'users', user.uid));
                 if(uDoc.exists()) {
                     window.appData.role = uDoc.data().role;
-                    document.getElementById('u-role').textContent = window.appData.role==='admin'?'مدير':'موظف';
                     if(window.appData.role === 'admin') document.getElementById('admin-section').style.display = 'block';
                 }
 
+                // Snapshots
                 onSnapshot(doc(db, "attendance", user.uid), (doc) => {
                     if(doc.exists()) window.appData.events = doc.data().events || {};
                     window.app.renderCalendar();
                     window.app.checkAutoFill();
                 });
                 onSnapshot(doc(db, "settings", user.uid), (doc) => {
-                    if(doc.exists()) window.appData.personal = doc.data() || {joinDate:'', adjustments:[]};
-                    window.app.updateLogic(); 
+                    if(doc.exists()) window.appData.personal = doc.data() || {joinDate:'', fullName:'', adjustments:[], dismissedMsgs:[], deletedMsgs:[]};
+                    if(!window.appData.personal.dismissedMsgs) window.appData.personal.dismissedMsgs = [];
+                    if(!window.appData.personal.deletedMsgs) window.appData.personal.deletedMsgs = [];
+                    
+                    const displayName = window.appData.personal.fullName || user.email.split('@')[0];
+                    document.getElementById('u-name').textContent = displayName;
+                    document.getElementById('u-role').textContent = window.appData.role==='admin'?'مدير':'موظف';
+                    window.app.calcStats();
+                    window.app.checkMessages();
                 });
                 onSnapshot(doc(db, "config", "general"), (doc) => {
                     if(doc.exists()) window.appData.global = doc.data() || {presets:[]};
                 });
+                
+                const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
+                onSnapshot(q, (snapshot) => {
+                    let msgs = [];
+                    snapshot.forEach((doc) => msgs.push({ id: doc.id, ...doc.data() }));
+                    window.appData.messages = msgs;
+                    window.app.checkMessages();
+                });
+
                 window.showLoader(false);
             } else {
                 if(user) await signOut(auth);
@@ -359,16 +462,89 @@
 
     <!-- App Logic -->
     <script>
-        const dayNames = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+        const dayNames = ["إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت", "أحد"];
         const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         let currentDate = new Date(2026, 0, 1);
         let selectedKey = null;
+        let activeMsgId = null;
 
         window.appData = {
-            role: 'user', events: {}, personal: { joinDate:'', adjustments:[] }, global: { presets:[{label:'عادي', start:'08:00', end:'16:00'}] }
+            role: 'user', events: {}, 
+            personal: { joinDate:'', fullName:'', adjustments:[], dismissedMsgs:[], deletedMsgs:[] }, 
+            global: { presets:[{label:'عادي', start:'08:00', end:'16:00'}] },
+            messages: []
         };
 
         window.app = {
+            // Messages
+            sendBroadcast: () => {
+                const txt = document.getElementById('admin-msg-text').value;
+                if(!txt) return alert("اكتب رسالة");
+                window.sendAdminMessage(txt);
+                document.getElementById('admin-msg-text').value = '';
+            },
+
+            checkMessages: () => {
+                let unreadCount = 0;
+                let activePopupMsg = null;
+                window.appData.messages.forEach(msg => {
+                    if(window.appData.personal.deletedMsgs.includes(msg.id)) return;
+                    if(!window.appData.personal.dismissedMsgs.includes(msg.id)) {
+                        unreadCount++;
+                        if(!activePopupMsg) activePopupMsg = msg;
+                    }
+                });
+
+                const badge = document.getElementById('msg-badge');
+                if(unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                if(activePopupMsg) {
+                    activeMsgId = activePopupMsg.id;
+                    document.getElementById('live-msg-content').textContent = activePopupMsg.content;
+                    document.getElementById('msgPopup').style.display = 'flex';
+                } else {
+                    document.getElementById('msgPopup').style.display = 'none';
+                }
+            },
+
+            dismissMessage: () => {
+                if(activeMsgId) {
+                    window.appData.personal.dismissedMsgs.push(activeMsgId);
+                    window.saveData('personal_settings', window.appData.personal);
+                    document.getElementById('msgPopup').style.display = 'none';
+                }
+            },
+
+            openInbox: () => {
+                const list = document.getElementById('inbox-list');
+                list.innerHTML = '';
+                const visibleMsgs = window.appData.messages.filter(m => !window.appData.personal.deletedMsgs.includes(m.id));
+
+                if(visibleMsgs.length === 0) list.innerHTML = '<div style="text-align:center; padding:20px; color:#999">لا رسائل</div>';
+                else {
+                    visibleMsgs.forEach(msg => {
+                        let dateStr = "الآن";
+                        if(msg.createdAt) dateStr = new Date(msg.createdAt.seconds * 1000).toLocaleDateString('ar-EG');
+                        list.innerHTML += `<div class="msg-item"><div class="msg-body">${msg.content}</div><div class="msg-footer"><span>${dateStr}</span><span class="del-icon" onclick="window.app.deleteMessage('${msg.id}')">حذف</span></div></div>`;
+                    });
+                }
+                document.getElementById('inboxModal').style.display = 'flex';
+            },
+
+            deleteMessage: (msgId) => {
+                if(confirm("حذف نهائي؟")) {
+                    window.appData.personal.deletedMsgs.push(msgId);
+                    window.saveData('personal_settings', window.appData.personal);
+                    window.app.openInbox();
+                }
+            },
+
+            // Calendar
             checkAutoFill: () => {
                 const today = new Date(); today.setHours(0,0,0,0);
                 let startCheck = new Date(2026, 0, 1);
@@ -401,9 +577,10 @@
                 const y = currentDate.getFullYear();
                 const m = currentDate.getMonth();
                 document.getElementById('cal-title').textContent = `${monthNames[m]} ${y}`;
-                const firstDay = new Date(y, m, 1).getDay();
+                let firstDayIndex = new Date(y, m, 1).getDay();
+                firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
                 const daysInMonth = new Date(y, m + 1, 0).getDate();
-                for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+                for(let i=0; i<firstDayIndex; i++) grid.innerHTML += `<div></div>`;
                 for(let i=1; i<=daysInMonth; i++) {
                     const key = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                     const evt = window.appData.events[key];
@@ -416,10 +593,13 @@
                         else if(evt.type === 'recup') { cls = 'st-recup'; txt = 'تعويض'; }
                         else if(evt.type === 'eid') { cls = 'st-eid'; txt = evt.eidName || 'عيد'; }
                     }
+                    const currentLoopDate = new Date(y, m, i);
+                    const isWeekend = (currentLoopDate.getDay() === 0 || currentLoopDate.getDay() === 6);
+                    const weekendClass = isWeekend ? 'weekend' : '';
                     const todayClass = (new Date().toDateString() === new Date(y,m,i).toDateString()) ? 'today' : '';
-                    grid.innerHTML += `<div class="day-cell ${todayClass}" onclick="window.app.openDay('${key}')"><span>${i}</span>${evt ? `<div class="day-badge ${cls}">${txt}</div>` : ''}</div>`;
+                    grid.innerHTML += `<div class="day-cell ${todayClass} ${weekendClass}" onclick="window.app.openDay('${key}')"><span>${i}</span>${evt ? `<div class="day-badge ${cls}">${txt}</div>` : ''}</div>`;
                 }
-                window.app.updateLogic();
+                window.app.calcStats();
             },
 
             navMonth: (s) => { currentDate.setMonth(currentDate.getMonth() + s); window.app.renderCalendar(); },
@@ -478,6 +658,7 @@
 
             saveDay: () => {
                 const type = document.getElementById('d-type').value;
+                let targetKey = selectedKey;
                 if(type === 'holiday') {
                     let count = parseInt(document.getElementById('d-count').value);
                     let loopD = new Date(selectedKey);
@@ -500,7 +681,12 @@
                             const [h1, m1] = s.split(':').map(Number);
                             const [h2, m2] = e.split(':').map(Number);
                             let diff = (h2*60+m2) - (h1*60+m1);
-                            if(diff < 0) diff += 24*60;
+                            if(s > e) { // Night shift fix
+                                diff += 24*60;
+                                const currentD = new Date(selectedKey);
+                                currentD.setDate(currentD.getDate() + 1);
+                                targetKey = `${currentD.getFullYear()}-${String(currentD.getMonth()+1).padStart(2,'0')}-${String(currentD.getDate()).padStart(2,'0')}`;
+                            }
                             data.hours = parseFloat((diff/60).toFixed(2));
                         }
                         if(type === 'eid') {
@@ -513,48 +699,42 @@
                     } else if (type === 'recup') {
                         data.recupTarget = document.getElementById('d-recup-target').value;
                     }
-                    window.appData.events[selectedKey] = data;
+                    window.appData.events[targetKey] = data;
                 }
                 window.saveData('events', window.appData.events);
                 document.getElementById('dayModal').style.display = 'none';
             },
 
-            deleteDay: () => {
+            askDelete: () => {
+                document.getElementById('confirmModal').style.display = 'flex';
+            },
+
+            performDelete: () => {
                 if(window.appData.events[selectedKey]) {
                     delete window.appData.events[selectedKey];
-                    window.removeEventFromFire(selectedKey);
+                    window.fbDeleteDay(selectedKey);
                 }
+                document.getElementById('confirmModal').style.display = 'none';
                 document.getElementById('dayModal').style.display = 'none';
+                window.app.renderCalendar();
             },
 
-            // --- Logic Hub ---
-            updateLogic: () => {
-                window.app.calcStats();
-            },
-
+            // Logic Hub
             getLeaveBreakdown: () => {
-                const currentY = new Date(2026, 0, 1).getFullYear(); // Fixed to 2026 as per request start
+                const currentY = new Date(2026, 0, 1).getFullYear();
                 const joinDateStr = window.appData.personal.joinDate;
                 let pools = [];
 
-                // 1. Manual Adjustments (Treated as Oldest/Previous)
                 if(window.appData.personal.adjustments) {
                     window.appData.personal.adjustments.forEach((adj, i) => {
                         pools.push({ id: `adj_${i}`, label: `رصيد سابق/إضافي (${adj.reason})`, total: parseFloat(adj.amount), remaining: parseFloat(adj.amount), type: 'bonus' });
                     });
                 }
 
-                // 2. Yearly Entitlements
                 if(joinDateStr) {
                     const joinD = new Date(joinDateStr);
                     const joinY = joinD.getFullYear();
-                    // Loop from join year (or 2026 if joined earlier) up to CURRENT year (2026)
-                    // We DO NOT calculate for 2027+ yet
                     const startCalc = Math.max(joinY, 2026);
-                    const endCalc = new Date().getFullYear(); // Or fixed 2026 if simulating
-                    
-                    // Specific logic: Only calculate for years <= current real year
-                    // If simulating 2026:
                     for(let y = startCalc; y <= 2026; y++) {
                         let months = 12;
                         if(y === joinY) months = 12 - joinD.getMonth();
@@ -564,7 +744,6 @@
                     }
                 }
 
-                // 3. Deduct Holidays (FIFO)
                 const holidays = Object.entries(window.appData.events)
                     .filter(([k, v]) => v.type === 'holiday')
                     .sort((a, b) => new Date(a[0]) - new Date(b[0]));
@@ -595,11 +774,9 @@
                 const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay()); weekStart.setHours(0,0,0,0);
                 const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6); weekEnd.setHours(23,59,59,999);
 
-                // Calculate Leave
                 const breakdown = window.app.getLeaveBreakdown();
                 leave = breakdown.pools.reduce((sum, pool) => sum + pool.remaining, 0);
 
-                // Day Loop
                 const startLoop = new Date(yr, 0, 1);
                 const limitLoop = (yr === today.getFullYear()) ? today : new Date(yr, 11, 31);
                 for (let d = new Date(startLoop); d <= limitLoop; d.setDate(d.getDate() + 1)) {
@@ -662,7 +839,7 @@
                     if(bd.deductions.length > 0) {
                         list.innerHTML += `<div class="details-header">سجل الاستهلاك:</div>`;
                         bd.deductions.reverse().forEach(d => {
-                            list.innerHTML += `<div class="detail-item neg"><span>${d.date} <small>(${d.note})</small></span><span class="d-val">-1</span></div>`;
+                            list.innerHTML += `<div class="detail-item neg" onclick="window.app.openDay('${d.date}')"><span>${d.date} <small>(${d.note})</small></span><span class="d-val">-1</span></div>`;
                         });
                     } else {
                         list.innerHTML += `<div style="text-align:center; padding:10px;">لم يتم استهلاك أي عطلة</div>`;
@@ -671,7 +848,6 @@
                     return;
                 }
 
-                // ... (Logic for other categories sat, net, etc. remains same as previous code)
                 if (cat === 'sat') {
                     const start = new Date(yr, 0, 1);
                     const limit = (yr === today.getFullYear()) ? today : new Date(yr, 11, 31);
@@ -711,7 +887,6 @@
                         }
                     }
                 }
-
                 tempList.sort((a,b) => new Date(b.date) - new Date(a.date));
                 if(tempList.length === 0) list.innerHTML = '<div style="text-align:center; padding:10px;">لا توجد بيانات</div>';
                 tempList.forEach(item => {
@@ -754,6 +929,7 @@
 
             openSettings: () => {
                 document.getElementById('s-join').value = window.appData.personal.joinDate || '';
+                document.getElementById('s-name').value = window.appData.personal.fullName || '';
                 window.app.renderSettingsLists();
                 document.getElementById('settingsModal').style.display = 'flex';
             },
@@ -772,7 +948,11 @@
                 }
             },
 
-            delPreset: (i) => { window.appData.global.presets.splice(i, 1); window.app.renderSettingsLists(); },
+            delPreset: (i) => {
+                window.appData.global.presets.splice(i, 1);
+                window.app.renderSettingsLists();
+            },
+
             addAdj: () => {
                 const d = document.getElementById('adj-days').value;
                 const r = document.getElementById('adj-note').value;
@@ -784,27 +964,35 @@
                     window.app.renderSettingsLists();
                 }
             },
-            delAdj: (i) => { window.appData.personal.adjustments.splice(i, 1); window.app.renderSettingsLists(); },
+
+            delAdj: (i) => {
+                window.appData.personal.adjustments.splice(i, 1);
+                window.app.renderSettingsLists();
+            },
 
             renderSettingsLists: () => {
                 const pl = document.getElementById('presets-list');
                 pl.innerHTML = '';
                 if(window.appData.global.presets) {
-                    window.appData.global.presets.forEach((p, i) => { pl.innerHTML += `<div class="preset-item"><span>${p.label} (${p.start}-${p.end})</span> <span class="del-icon" onclick="window.app.delPreset(${i})">X</span></div>`; });
+                    window.appData.global.presets.forEach((p, i) => {
+                        pl.innerHTML += `<div class="preset-item"><span>${p.label} (${p.start}-${p.end})</span> <span class="del-icon" onclick="window.app.delPreset(${i})">X</span></div>`;
+                    });
                 }
                 const al = document.getElementById('adj-list');
                 al.innerHTML = '';
                 if(window.appData.personal.adjustments) {
-                    window.appData.personal.adjustments.forEach((a, i) => { al.innerHTML += `<div class="preset-item"><span>+${a.amount} (${a.reason})</span> <span class="del-icon" onclick="window.app.delAdj(${i})">X</span></div>`; });
+                    window.appData.personal.adjustments.forEach((a, i) => {
+                        al.innerHTML += `<div class="preset-item"><span>+${a.amount} (${a.reason})</span> <span class="del-icon" onclick="window.app.delAdj(${i})">X</span></div>`;
+                    });
                 }
             },
 
             saveSettings: () => {
                 window.appData.personal.joinDate = document.getElementById('s-join').value;
+                window.appData.personal.fullName = document.getElementById('s-name').value;
                 window.saveData('personal_settings', window.appData.personal);
                 if(window.appData.role === 'admin') window.saveData('global_config', window.appData.global);
                 document.getElementById('settingsModal').style.display = 'none';
-                window.app.renderCalendar();
             }
         };
     </script>

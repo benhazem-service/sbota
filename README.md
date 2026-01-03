@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المدير الذكي 2026 (Fix Today)</title>
+    <title>نظام الحضور الذكي 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -13,6 +13,7 @@
             --text: #2b2d42; --text-light: #8d99ae;
             --work: #4caf50; --holiday: #ffc107; --sick: #ff9800;
             --absent: #f44336; --eid: #9c27b0; --recup: #00bcd4;
+            --nat-color: #ec407a; /* لون العيد الوطني الموحد */
             --radius: 16px;
         }
 
@@ -68,56 +69,38 @@
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-name { font-size: 0.75rem; color: var(--text-light); text-align: center; font-weight: bold; }
         
-        /* Day Cells */
         .day-cell { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
             padding-top: 5px; border-radius: 10px; background: #f8f9fa; cursor: pointer; position: relative; border: 1px solid transparent; 
         }
         .day-cell span { font-weight: bold; font-size: 0.9rem; color: #444; z-index: 2; position: absolute; top: 4px; right: 6px; line-height: 1; }
+        .day-cell.today { border-color: var(--primary); background: #e3f2fd !important; }
         
-        /* Today */
-        .day-cell.today { border: 2px solid var(--primary) !important; background: #e3f2fd !important; }
-        
-        /* Weekend Style (Lavender) */
+        /* Weekend Style */
         .day-cell.weekend { background-color: #E6E6FA; color: #4a4a4a; border: 1px dashed #d1c4e9; }
         
-        /* National Holiday (Frame Only) */
-        .day-cell.nat-holiday { background-color: transparent !important; border: 2px solid #ec407a !important; }
-
-        /* Future Days */
-        .day-cell.future { opacity: 0.5; cursor: default; background: #f0f0f0 !important; border: 1px solid #eee !important; color: #ccc !important; }
+        /* National Holiday Style (Matching Legend) */
+        .day-cell.nat-holiday { 
+            background-color: #fce4ec; /* Pinkish background */
+            border: 2px solid var(--nat-color) !important; /* Dark Pink border */
+        }
         
-        /* Future Weekend (Frame Only) */
-        .day-cell.weekend.future {
-            background-color: transparent !important;
-            border: 2px solid #b39ddb !important; /* إطار بنفسجي للعطل الأسبوعية القادمة */
-            opacity: 0.6;
-        }
+        .day-cell.future { opacity: 0.5; cursor: default; }
+        .day-cell.nat-holiday.future { cursor: pointer; opacity: 1; }
 
-        /* Future Nat Holiday (Frame Only) */
-        .day-cell.nat-holiday.future {
-            background-color: transparent !important;
-            border: 2px solid #ec407a !important; /* إطار وردي */
-            cursor: pointer;
-            opacity: 1;
-        }
-
-        /* Full Color Classes */
+        .day-badge { font-size: 0.6rem; margin-top: 2px; border-radius: 4px; padding: 1px 4px; color: white; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; }
+        
+        /* Full Colors */
         .day-cell.st-work { background-color: var(--work) !important; color: white !important; }
         .day-cell.st-work span { color: white !important; }
-
         .day-cell.st-holiday { background-color: var(--holiday) !important; color: #333 !important; }
         .day-cell.st-holiday span { color: #333 !important; }
-
         .day-cell.st-sick { background-color: var(--sick) !important; color: white !important; }
         .day-cell.st-sick span { color: white !important; }
-
         .day-cell.st-absent { background-color: var(--absent) !important; color: white !important; }
         .day-cell.st-absent span { color: white !important; }
-
         .day-cell.st-eid { background-color: var(--eid) !important; color: white !important; }
         .day-cell.st-eid span { color: white !important; }
-
         .day-cell.st-recup { background-color: var(--recup) !important; color: white !important; }
         .day-cell.st-recup span { color: white !important; }
 
@@ -131,7 +114,7 @@
         .lg-absent { background-color: var(--absent); }
         .lg-recup { background-color: var(--recup); }
         .lg-eid { background-color: var(--eid); }
-        .lg-nat { background-color: transparent; border: 2px solid #ec407a; }
+        .lg-nat { background-color: #fce4ec; border: 2px solid var(--nat-color); } /* Matched */
 
         #legend-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 3000; }
         .show-toast { opacity: 1 !important; }
@@ -252,7 +235,7 @@
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-content">
             <h3 style="color:#f44336; margin-bottom:10px;">⚠️ تأكيد الحذف</h3>
-            <p style="color:#666; margin-bottom:20px;">هل أنت متأكد من مسح تسجيل هذا اليوم نهائياً؟</p>
+            <p style="color:#666; margin-bottom:20px;">هل أنت متأكد من مسح هذا العنصر نهائياً؟</p>
             <div class="modal-btns">
                 <button class="btn-del" onclick="window.app.performDelete()">نعم، احذف</button>
                 <button class="btn-save" style="background:#e0e0e0; color:#333;" onclick="document.getElementById('confirmModal').style.display='none'">تراجع</button>
@@ -296,7 +279,7 @@
             </div>
             <div class="modal-btns">
                 <button class="btn-save" onclick="window.app.saveDay()">حفظ</button>
-                <button class="btn-del" onclick="window.app.askDelete()">مسح</button>
+                <button class="btn-del" onclick="window.app.askDelete('day')">مسح</button>
             </div>
             <button class="btn-close-modal" onclick="document.getElementById('dayModal').style.display='none'">إغلاق</button>
         </div>
@@ -308,12 +291,19 @@
             <h3 id="search-title" style="text-align:center;">بحث / تفاصيل</h3>
             <div id="search-inputs">
                 <label class="form-label">فلترة البحث:</label>
-                <div style="display:flex; gap:5px; margin-bottom:10px;">
-                    <select id="search-day-name" class="app-input" onchange="window.app.performSearch()">
-                        <option value="">-- كل الأيام --</option><option value="1">الإثنين</option><option value="2">الثلاثاء</option><option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option><option value="0">الأحد</option>
+                <div style="display:flex; gap:5px; margin-bottom:10px; flex-wrap: wrap;">
+                    <select id="search-month" class="app-input" style="flex:1;" onchange="window.app.performSearch()">
+                        <option value="">الأشهر</option>
+                        <option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option>
+                        <option value="4">أبريل</option><option value="5">مايو</option><option value="6">يونيو</option>
+                        <option value="7">يوليو</option><option value="8">أغسطس</option><option value="9">سبتمبر</option>
+                        <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>
                     </select>
-                    <select id="search-type" class="app-input" onchange="window.app.performSearch()">
-                        <option value="">-- كل الحالات --</option>
+                    <select id="search-day-name" class="app-input" style="flex:1;" onchange="window.app.performSearch()">
+                        <option value="">الأيام</option><option value="1">الإثنين</option><option value="2">الثلاثاء</option><option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option><option value="0">الأحد</option>
+                    </select>
+                    <select id="search-type" class="app-input" style="flex:1; width:100%;" onchange="window.app.performSearch()">
+                        <option value="">الحالات</option>
                         <option value="work">✅ عمل</option><option value="holiday">🏖️ عطلة</option><option value="sick">💊 مرض</option>
                         <option value="eid">🎉 أعياد</option><option value="recup">🔄 تعويض</option><option value="absent">❌ غياب</option>
                     </select>
@@ -389,6 +379,7 @@
         };
         window.togglePass = (id) => { const el=document.getElementById(id); el.type = el.type==='password'?'text':'password'; };
 
+        // --- Auth Logic ---
         window.handleLogin = async () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
@@ -502,7 +493,10 @@
                     
                     const displayName = window.appData.personal.fullName || user.email.split('@')[0];
                     document.getElementById('u-name').textContent = displayName;
-                    document.getElementById('u-role').textContent = window.appData.role==='admin'?'مدير':'موظف';
+                    // FIX: Admin name
+                    const roleText = window.appData.role === 'admin' ? 'مدير النظام' : '';
+                    document.getElementById('u-role').textContent = roleText;
+                    
                     window.app.calcStats();
                     window.app.checkMessages();
                 });
@@ -536,6 +530,8 @@
         let currentDate = new Date(2026, 0, 1);
         let selectedKey = null;
         let activeMsgId = null;
+        let deleteType = null; // 'day' or 'msg'
+        let pendingMsgId = null;
 
         window.appData = {
             role: 'user', events: {}, 
@@ -599,18 +595,34 @@
                     visibleMsgs.forEach(msg => {
                         let dateStr = "الآن";
                         if(msg.createdAt) dateStr = new Date(msg.createdAt.seconds * 1000).toLocaleDateString('ar-EG');
-                        list.innerHTML += `<div class="msg-item"><div class="msg-body">${msg.content}</div><div class="msg-footer"><span>${dateStr}</span><span class="del-icon" onclick="window.app.deleteMessage('${msg.id}')">حذف</span></div></div>`;
+                        list.innerHTML += `<div class="msg-item"><div class="msg-body">${msg.content}</div><div class="msg-footer"><span>${dateStr}</span><span class="del-icon" onclick="window.app.askDelete('msg', '${msg.id}')">حذف</span></div></div>`;
                     });
                 }
                 document.getElementById('inboxModal').style.display = 'flex';
             },
 
-            deleteMessage: (msgId) => {
-                if(confirm("حذف نهائي؟")) {
-                    window.appData.personal.deletedMsgs.push(msgId);
+            // --- Unified Delete Logic ---
+            askDelete: (type, id) => {
+                deleteType = type;
+                if(type === 'msg') pendingMsgId = id;
+                document.getElementById('confirmModal').style.display = 'flex';
+            },
+
+            performDelete: () => {
+                if(deleteType === 'day') {
+                    if(window.appData.events[selectedKey]) {
+                        delete window.appData.events[selectedKey];
+                        window.fbDeleteDay(selectedKey);
+                    }
+                    document.getElementById('dayModal').style.display = 'none';
+                } else if(deleteType === 'msg') {
+                    if(!window.appData.personal.deletedMsgs) window.appData.personal.deletedMsgs = [];
+                    window.appData.personal.deletedMsgs.push(pendingMsgId);
                     window.saveData('personal_settings', window.appData.personal);
-                    window.app.openInbox();
+                    window.app.openInbox(); // Refresh UI
                 }
+                document.getElementById('confirmModal').style.display = 'none';
+                window.app.renderCalendar();
             },
 
             // --- Legend Toast ---
@@ -627,9 +639,7 @@
                 let startCheck = new Date(2026, 0, 1);
                 if (today < startCheck) return;
                 
-                // Get Last Saved Time (Memory Feature)
-                let lastStart = '08:00';
-                let lastEnd = '16:00';
+                let lastStart = '08:00', lastEnd = '16:00';
                 if(window.appData.global.presets && window.appData.global.presets.length > 0) {
                     lastStart = window.appData.global.presets[0].start;
                     lastEnd = window.appData.global.presets[0].end;
@@ -642,12 +652,9 @@
                     const k = `${loopDate.getFullYear()}-${String(loopDate.getMonth()+1).padStart(2,'0')}-${String(loopDate.getDate()).padStart(2,'0')}`;
                     const evt = window.appData.events[k];
                     
-                    // 1. If exists and is work, update memory
                     if (evt && evt.type === 'work' && evt.start && evt.end) {
-                        lastStart = evt.start;
-                        lastEnd = evt.end;
+                        lastStart = evt.start; lastEnd = evt.end;
                     }
-                    // 2. If missing and is work day (Mon-Fri), auto-fill using memory
                     else if (!evt) {
                         const dNum = loopDate.getDay();
                         if (dNum !== 0 && dNum !== 6) {
@@ -700,25 +707,16 @@
                         natClass = 'nat-holiday';
                     }
 
-                    // Strict Date Comparison for "Is Future"
-                    // Create normalized dates (00:00:00)
-                    const loopDate = new Date(y, m, i);
-                    loopDate.setHours(0,0,0,0);
+                    const currentLoopDate = new Date(y, m, i);
+                    const now = new Date();
+                    now.setHours(0,0,0,0);
+                    const isFuture = currentLoopDate.setHours(0,0,0,0) > now.getTime();
                     
-                    const today = new Date();
-                    today.setHours(0,0,0,0);
-
-                    const isFuture = loopDate > today;
-                    
-                    const isWeekend = (loopDate.getDay() === 0 || loopDate.getDay() === 6);
+                    const isWeekend = (currentLoopDate.getDay() === 0 || currentLoopDate.getDay() === 6);
                     const weekendClass = isWeekend ? 'weekend' : '';
-                    
-                    const isToday = loopDate.getTime() === today.getTime();
-                    const todayClass = isToday ? 'today' : '';
-                    
+                    const todayClass = (new Date().toDateString() === new Date(y,m,i).toDateString()) ? 'today' : '';
                     const futureClass = isFuture ? 'future' : '';
                     
-                    // Allow click if: (Not Future) OR (Is Future AND Is National Holiday)
                     const isClickable = !isFuture || isNat;
                     const clickAction = isClickable ? `onclick="window.app.openDay('${key}')"` : '';
 
@@ -735,15 +733,12 @@
 
             openDay: (key) => {
                 const dateObj = new Date(key);
-                dateObj.setHours(0,0,0,0);
-                const today = new Date();
-                today.setHours(0,0,0,0);
-
                 const hKey = `${dateObj.getMonth()+1}-${dateObj.getDate()}`;
                 const natName = nationalHolidays[hKey];
                 
-                // Allow if not future OR is national holiday
-                if(dateObj > today && !natName) return;
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if(new Date(key).setHours(0,0,0,0) > today.getTime() && !natName) return;
 
                 selectedKey = key;
                 document.getElementById('modal-title').textContent = key;
@@ -751,7 +746,6 @@
                 
                 let evt = window.appData.events[key];
                 
-                // Pre-fill if national holiday and not set
                 if (!evt && natName) {
                     evt = { type: 'eid', eidStatus: 'rest', eidName: natName };
                 } else if (!evt) {
@@ -835,7 +829,7 @@
                             const [h1, m1] = s.split(':').map(Number);
                             const [h2, m2] = e.split(':').map(Number);
                             let diff = (h2*60+m2) - (h1*60+m1);
-                            if(s > e) { // Night shift fix
+                            if(s > e) { // Night shift
                                 diff += 24*60;
                                 const currentD = new Date(selectedKey);
                                 currentD.setDate(currentD.getDate() + 1);
@@ -859,18 +853,27 @@
                 document.getElementById('dayModal').style.display = 'none';
             },
 
-            askDelete: () => {
+            askDelete: (type, id) => {
+                deleteType = type;
+                if(type==='msg') pendingMsgId = id;
                 document.getElementById('confirmModal').style.display = 'flex';
             },
 
             performDelete: () => {
-                if(window.appData.events[selectedKey]) {
-                    delete window.appData.events[selectedKey];
-                    window.fbDeleteDay(selectedKey);
+                if(deleteType === 'day') {
+                    if(window.appData.events[selectedKey]) {
+                        delete window.appData.events[selectedKey];
+                        window.fbDeleteDay(selectedKey);
+                    }
+                    document.getElementById('dayModal').style.display = 'none';
+                    window.app.renderCalendar();
+                } else if(deleteType === 'msg') {
+                    if(!window.appData.personal.deletedMsgs) window.appData.personal.deletedMsgs = [];
+                    window.appData.personal.deletedMsgs.push(pendingMsgId);
+                    window.saveData('personal_settings', window.appData.personal);
+                    window.app.openInbox();
                 }
                 document.getElementById('confirmModal').style.display = 'none';
-                document.getElementById('dayModal').style.display = 'none';
-                window.app.renderCalendar();
             },
 
             // --- Logic Hub ---
@@ -1059,16 +1062,19 @@
             performSearch: () => {
                 const dayVal = document.getElementById('search-day-name').value;
                 const typeVal = document.getElementById('search-type').value;
+                const monthVal = document.getElementById('search-month').value;
                 const list = document.getElementById('search-results');
                 list.innerHTML = '';
-                if(dayVal === "" && typeVal === "") return;
+                if(dayVal === "" && typeVal === "" && monthVal === "") return;
+                
                 const results = [];
                 for(let k in window.appData.events) {
                     const evt = window.appData.events[k];
                     const d = new Date(k);
                     let matchDay = (dayVal === "") || (d.getDay() == parseInt(dayVal));
                     let matchType = (typeVal === "") || (evt.type === typeVal);
-                    if(matchDay && matchType) results.push({date:k, ...evt});
+                    let matchMonth = (monthVal === "") || (d.getMonth() + 1 == parseInt(monthVal));
+                    if(matchDay && matchType && matchMonth) results.push({date:k, ...evt});
                 }
                 results.sort((a,b) => new Date(b.date) - new Date(a.date));
                 if(results.length === 0) list.innerHTML = '<div style="text-align:center; padding:10px;">لا توجد نتائج</div>';

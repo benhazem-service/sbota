@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام الحضور الذكي 2026</title>
+    <title>المدير الذكي 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -13,7 +13,6 @@
             --text: #2b2d42; --text-light: #8d99ae;
             --work: #4caf50; --holiday: #ffc107; --sick: #ff9800;
             --absent: #f44336; --eid: #9c27b0; --recup: #00bcd4;
-            --nat-color: #ec407a; /* لون العيد الوطني الموحد */
             --radius: 16px;
         }
 
@@ -47,14 +46,24 @@
         
         /* App Layout */
         #app-container { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
-        .header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; gap: 10px; }
+        
+        .header { 
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; 
+            background: var(--surface); padding: 15px; border-radius: var(--radius); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; gap: 10px;
+        }
         .header-info { display: flex; flex-direction: column; min-width: 120px; }
-        .header-info h3 { margin: 0; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* App Title Style */
+        .app-main-title { margin: 0; font-size: 1.2rem; color: var(--primary-dark); font-weight: bold; }
+        .user-sub-title { font-size: 0.9rem; color: #7f8c8d; }
+        .user-sub-title span { color: var(--primary); font-weight: 600; }
+
         .header-actions { display: flex; gap: 8px; }
         .action-btn { background: #f1f5f9; border: 1px solid #e2e8f0; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; color: #64748b; position: relative; }
         .badge-count { position: absolute; top: -5px; left: -5px; background: #f44336; color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: none; justify-content: center; align-items: center; border: 2px solid white; }
 
-        /* Stats */
+        /* Stats & Calendar Styles */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         .stat-card { background: var(--surface); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); cursor: pointer; }
         .stat-card h4 { margin: 0; font-size: 0.75rem; color: var(--text-light); }
@@ -63,7 +72,6 @@
         .full-width { grid-column: span 2; }
         .txt-red { color: #f44336 !important; } .txt-green { color: #4caf50 !important; }
 
-        /* Calendar */
         .calendar-box { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
@@ -76,21 +84,10 @@
         .day-cell span { font-weight: bold; font-size: 0.9rem; color: #444; z-index: 2; position: absolute; top: 4px; right: 6px; line-height: 1; }
         .day-cell.today { border-color: var(--primary); background: #e3f2fd !important; }
         
-        /* Weekend Style */
         .day-cell.weekend { background-color: #E6E6FA; color: #4a4a4a; border: 1px dashed #d1c4e9; }
-        
-        /* National Holiday Style (Matching Legend) */
-        .day-cell.nat-holiday { 
-            background-color: #fce4ec; /* Pinkish background */
-            border: 2px solid var(--nat-color) !important; /* Dark Pink border */
-        }
-        
         .day-cell.future { opacity: 0.5; cursor: default; }
-        .day-cell.nat-holiday.future { cursor: pointer; opacity: 1; }
 
-        .day-badge { font-size: 0.6rem; margin-top: 2px; border-radius: 4px; padding: 1px 4px; color: white; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; }
-        
-        /* Full Colors */
+        /* Full Color Classes */
         .day-cell.st-work { background-color: var(--work) !important; color: white !important; }
         .day-cell.st-work span { color: white !important; }
         .day-cell.st-holiday { background-color: var(--holiday) !important; color: #333 !important; }
@@ -104,6 +101,15 @@
         .day-cell.st-recup { background-color: var(--recup) !important; color: white !important; }
         .day-cell.st-recup span { color: white !important; }
 
+        /* --- National Holiday (Matching Color) --- */
+        .day-cell.nat-holiday { 
+            background-color: #f8bbd0 !important; /* لون وردي فاتح للخلفية */
+            border: 2px solid #ec407a !important; /* إطار وردي غامق */
+            color: #880e4f !important;            /* نص غامق */
+        }
+        .day-cell.nat-holiday span { color: #880e4f !important; }
+        .day-cell.nat-holiday.future { cursor: pointer; opacity: 1; }
+
         /* Legend */
         .legend-container { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding: 10px; background: var(--surface); border-radius: var(--radius); }
         .legend-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -114,7 +120,8 @@
         .lg-absent { background-color: var(--absent); }
         .lg-recup { background-color: var(--recup); }
         .lg-eid { background-color: var(--eid); }
-        .lg-nat { background-color: #fce4ec; border: 2px solid var(--nat-color); } /* Matched */
+        /* Matching National Holiday Legend */
+        .lg-nat { background-color: #f8bbd0; border: 2px solid #ec407a; }
 
         #legend-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 3000; }
         .show-toast { opacity: 1 !important; }
@@ -154,7 +161,10 @@
     <div id="auth-overlay">
         <div class="auth-card">
             <div id="view-login" class="view-section active">
-                <div class="auth-header"><h2>تسجيل الدخول</h2><p>مرحباً بك مجدداً</p></div>
+                <div class="auth-header">
+                    <h2 id="auth-title-text">نظام الحضور الذكي</h2>
+                    <p>تسجيل الدخول</p>
+                </div>
                 <div class="input-group"><input type="email" id="login-email" class="app-input" placeholder="البريد الإلكتروني"></div>
                 <div class="input-group"><input type="password" id="login-pass" class="app-input" placeholder="كلمة المرور"><span class="toggle-password" onclick="togglePass('login-pass')">👁️</span></div>
                 <div style="display:flex; align-items:center; margin-bottom:15px; font-size:0.9rem;"><input type="checkbox" id="remember-me" style="margin-left:8px;"> <label for="remember-me">تذكرني</label></div>
@@ -186,8 +196,9 @@
     <div id="app-container">
         <div class="header">
             <div class="header-info">
-                <h3>مرحباً، <span id="u-name" style="color:var(--primary)">...</span></h3>
-                <span id="u-role" style="font-size:0.75rem; color:#888;"></span>
+                <!-- App Title Dynamic -->
+                <h2 id="header-title" class="app-main-title">نظام الحضور الذكي</h2>
+                <div class="user-sub-title">مرحباً، <span id="u-name">...</span></div>
             </div>
             <div class="header-actions">
                 <button class="action-btn" onclick="window.app.openInbox()">
@@ -235,7 +246,7 @@
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-content">
             <h3 style="color:#f44336; margin-bottom:10px;">⚠️ تأكيد الحذف</h3>
-            <p style="color:#666; margin-bottom:20px;">هل أنت متأكد من مسح هذا العنصر نهائياً؟</p>
+            <p style="color:#666; margin-bottom:20px;">هل أنت متأكد من مسح تسجيل هذا اليوم نهائياً؟</p>
             <div class="modal-btns">
                 <button class="btn-del" onclick="window.app.performDelete()">نعم، احذف</button>
                 <button class="btn-save" style="background:#e0e0e0; color:#333;" onclick="document.getElementById('confirmModal').style.display='none'">تراجع</button>
@@ -279,7 +290,7 @@
             </div>
             <div class="modal-btns">
                 <button class="btn-save" onclick="window.app.saveDay()">حفظ</button>
-                <button class="btn-del" onclick="window.app.askDelete('day')">مسح</button>
+                <button class="btn-del" onclick="window.app.askDelete()">مسح</button>
             </div>
             <button class="btn-close-modal" onclick="document.getElementById('dayModal').style.display='none'">إغلاق</button>
         </div>
@@ -320,7 +331,13 @@
             <h3 style="text-align:center;">الإعدادات</h3>
             
             <div id="admin-section" style="display:none; margin-bottom:15px;">
-                <div style="background:#fff3e0; padding:10px; border-radius:10px; border:1px solid #ffcc80; margin-bottom:15px;">
+                <!-- App Name Customization -->
+                <div style="background:#e3f2fd; padding:10px; border-radius:10px; margin-bottom:10px;">
+                     <label class="form-label" style="color:#1565c0; font-weight:bold;">اسم البرنامج (للكل):</label>
+                     <input type="text" id="p-app-name" class="app-input" placeholder="مثال: شركة النور">
+                </div>
+
+                <div style="background:#fff3e0; padding:10px; border-radius:10px; border:1px solid #ffcc80; margin-bottom:10px;">
                     <label class="form-label" style="color:#ef6c00; font-weight:bold;">✉️ إرسال رسالة للموظفين:</label>
                     <textarea id="admin-msg-text" class="app-input" rows="2" placeholder="اكتب الرسالة هنا..."></textarea>
                     <button class="btn-main" style="background:#ff9800; margin-top:0;" onclick="window.app.sendBroadcast()">إرسال للكل</button>
@@ -493,15 +510,20 @@
                     
                     const displayName = window.appData.personal.fullName || user.email.split('@')[0];
                     document.getElementById('u-name').textContent = displayName;
-                    // FIX: Admin name
-                    const roleText = window.appData.role === 'admin' ? 'مدير النظام' : '';
-                    document.getElementById('u-role').textContent = roleText;
                     
                     window.app.calcStats();
                     window.app.checkMessages();
                 });
                 onSnapshot(doc(db, "config", "general"), (doc) => {
-                    if(doc.exists()) window.appData.global = doc.data() || {presets:[]};
+                    if(doc.exists()) {
+                        window.appData.global = doc.data() || {presets:[], appName:'نظام الحضور الذكي'};
+                        // Update App Name Dynamic
+                        if(window.appData.global.appName) {
+                            document.title = window.appData.global.appName;
+                            document.getElementById('header-title').textContent = window.appData.global.appName;
+                            document.getElementById('auth-title-text').textContent = window.appData.global.appName;
+                        }
+                    }
                 });
                 
                 const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
@@ -530,13 +552,13 @@
         let currentDate = new Date(2026, 0, 1);
         let selectedKey = null;
         let activeMsgId = null;
-        let deleteType = null; // 'day' or 'msg'
+        let deleteType = null;
         let pendingMsgId = null;
 
         window.appData = {
             role: 'user', events: {}, 
             personal: { joinDate:'', fullName:'', adjustments:[], dismissedMsgs:[], deletedMsgs:[] }, 
-            global: { presets:[{label:'عادي', start:'08:00', end:'16:00'}] },
+            global: { appName:'نظام الحضور الذكي', presets:[{label:'عادي', start:'08:00', end:'16:00'}] },
             messages: []
         };
 
@@ -601,9 +623,8 @@
                 document.getElementById('inboxModal').style.display = 'flex';
             },
 
-            // --- Unified Delete Logic ---
             askDelete: (type, id) => {
-                deleteType = type;
+                deleteType = type || 'day';
                 if(type === 'msg') pendingMsgId = id;
                 document.getElementById('confirmModal').style.display = 'flex';
             },
@@ -615,14 +636,14 @@
                         window.fbDeleteDay(selectedKey);
                     }
                     document.getElementById('dayModal').style.display = 'none';
+                    window.app.renderCalendar();
                 } else if(deleteType === 'msg') {
                     if(!window.appData.personal.deletedMsgs) window.appData.personal.deletedMsgs = [];
                     window.appData.personal.deletedMsgs.push(pendingMsgId);
                     window.saveData('personal_settings', window.appData.personal);
-                    window.app.openInbox(); // Refresh UI
+                    window.app.openInbox();
                 }
                 document.getElementById('confirmModal').style.display = 'none';
-                window.app.renderCalendar();
             },
 
             // --- Legend Toast ---
@@ -639,7 +660,9 @@
                 let startCheck = new Date(2026, 0, 1);
                 if (today < startCheck) return;
                 
-                let lastStart = '08:00', lastEnd = '16:00';
+                // Get Last Saved Time (Memory Feature)
+                let lastStart = '08:00';
+                let lastEnd = '16:00';
                 if(window.appData.global.presets && window.appData.global.presets.length > 0) {
                     lastStart = window.appData.global.presets[0].start;
                     lastEnd = window.appData.global.presets[0].end;
@@ -652,9 +675,12 @@
                     const k = `${loopDate.getFullYear()}-${String(loopDate.getMonth()+1).padStart(2,'0')}-${String(loopDate.getDate()).padStart(2,'0')}`;
                     const evt = window.appData.events[k];
                     
+                    // 1. If exists and is work, update memory
                     if (evt && evt.type === 'work' && evt.start && evt.end) {
-                        lastStart = evt.start; lastEnd = evt.end;
+                        lastStart = evt.start;
+                        lastEnd = evt.end;
                     }
+                    // 2. If missing and is work day (Mon-Fri), auto-fill using memory
                     else if (!evt) {
                         const dNum = loopDate.getDay();
                         if (dNum !== 0 && dNum !== 6) {
@@ -714,9 +740,12 @@
                     
                     const isWeekend = (currentLoopDate.getDay() === 0 || currentLoopDate.getDay() === 6);
                     const weekendClass = isWeekend ? 'weekend' : '';
-                    const todayClass = (new Date().toDateString() === new Date(y,m,i).toDateString()) ? 'today' : '';
+                    
+                    const todayClass = (currentLoopDate.getTime() === now.getTime()) ? 'today' : '';
+                    
                     const futureClass = isFuture ? 'future' : '';
                     
+                    // Allow clicking future IF it is national holiday OR if it is NOT future
                     const isClickable = !isFuture || isNat;
                     const clickAction = isClickable ? `onclick="window.app.openDay('${key}')"` : '';
 
@@ -736,6 +765,7 @@
                 const hKey = `${dateObj.getMonth()+1}-${dateObj.getDate()}`;
                 const natName = nationalHolidays[hKey];
                 
+                // Allow if not future OR is national holiday
                 const today = new Date();
                 today.setHours(0,0,0,0);
                 if(new Date(key).setHours(0,0,0,0) > today.getTime() && !natName) return;
@@ -746,6 +776,7 @@
                 
                 let evt = window.appData.events[key];
                 
+                // Pre-fill if national holiday and not set
                 if (!evt && natName) {
                     evt = { type: 'eid', eidStatus: 'rest', eidName: natName };
                 } else if (!evt) {
@@ -829,7 +860,7 @@
                             const [h1, m1] = s.split(':').map(Number);
                             const [h2, m2] = e.split(':').map(Number);
                             let diff = (h2*60+m2) - (h1*60+m1);
-                            if(s > e) { // Night shift
+                            if(s > e) { // Night shift fix
                                 diff += 24*60;
                                 const currentD = new Date(selectedKey);
                                 currentD.setDate(currentD.getDate() + 1);
@@ -854,8 +885,8 @@
             },
 
             askDelete: (type, id) => {
-                deleteType = type;
-                if(type==='msg') pendingMsgId = id;
+                deleteType = type || 'day';
+                if(type === 'msg') pendingMsgId = id;
                 document.getElementById('confirmModal').style.display = 'flex';
             },
 
@@ -1150,6 +1181,8 @@
             saveSettings: () => {
                 window.appData.personal.joinDate = document.getElementById('s-join').value;
                 window.appData.personal.fullName = document.getElementById('s-name').value;
+                window.appData.global.appName = document.getElementById('p-app-name').value || window.appData.global.appName;
+                
                 window.saveData('personal_settings', window.appData.personal);
                 if(window.appData.role === 'admin') window.saveData('global_config', window.appData.global);
                 document.getElementById('settingsModal').style.display = 'none';

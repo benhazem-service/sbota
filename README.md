@@ -1038,88 +1038,100 @@
                 const leave = breakdown.pools.reduce((sum, pool) => sum + pool.remaining, 0);
                 let pending = 0;
 
-                // --- 1. Loop through RECORDED events for basic stats ---
-                Object.entries(window.appData.events).forEach(([k, evt]) => {
-                     const d = new Date(k);
-                     if(d.getFullYear()===yr) {
-                         const isRam = window.app.isRamadan(k);
-                         
-                         // 1. Calculate Total Annual Hours
-                         if(evt.type !== 'absent') {
-                             let h = evt.hours || 0;
-                             let effectiveHours = 0;
-                             
-                             // If it's a paid day (but not worked), assume 8h for totals
-                             if (evt.type === 'paid' || evt.type === 'holiday' || (evt.type === 'eid' && evt.eidStatus === 'rest')) {
-                                 effectiveHours = 8;
-                             } else if (isRam && h > 0) {
-                                 effectiveHours = h + 1;
-                             } else {
-                                 effectiveHours = h;
-                             }
-                             tYearWorkHours += effectiveHours;
-                         }
+                // --- 1. Loop through DATES from Jan 1 to Today for better implicit holiday handling ---
+                for (let d = new Date(yr, 0, 1); d <= new Date(); d.setDate(d.getDate() + 1)) {
+                    const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    const evt = window.appData.events[k];
+                    const isNat = nationalHolidays[`${d.getMonth()+1}-${d.getDate()}`];
+                    const isRam = window.app.isRamadan(k);
+                    const dayNum = d.getDay();
+                    const isWeekday = (dayNum >= 1 && dayNum <= 5); // Mon-Fri
 
-                         // 2. Net & Monthly/Weekly Stats
-                         if(evt.type==='work'||evt.type==='paid'||(evt.type==='eid'&&evt.eidStatus==='work')) {
-                             let h = evt.hours || 0;
-                             let effectiveHours = (evt.type === 'paid') ? 8 : (isRam ? (h + 1) : h);
-                             
-                             // --- Fix for Net Balance (Eid Work Logic) ---
-                             if (evt.type === 'eid' && evt.eidStatus === 'work') {
-                                 // Working on a holiday (bonus) adds full hours to net
-                                 net += effectiveHours;
-                             } else {
-                                 // Normal work deducts the standard 8h obligation
-                                 net += (effectiveHours - 8);
-                             }
+                    // ----------------------------------------
+                    // A) Total Annual Hours (tYearWorkHours)
+                    // ----------------------------------------
+                    let dayHours = 0;
+                    if (evt) {
+                        if (evt.type === 'work' || (evt.type === 'eid' && evt.eidStatus === 'work')) {
+                            // Actual work + Ramadan bonus
+                            dayHours = (evt.type === 'paid') ? 8 : (isRam ? (evt.hours + 1) : evt.hours);
+                            
+                            // If it is a holiday/eid worked, add the base 8h bonus
+                            if ((evt.type === 'eid' && evt.eidStatus === 'work') || (evt.type === 'work' && isNat)) {
+                                dayHours += 8; 
+                            }
+                        } 
+                        else if (evt.type === 'recup') {
+                            dayHours = 8; // Request: +8 for Recup
+                        }
+                        else if (evt.type === 'paid' || evt.type === 'holiday') {
+                            dayHours = 8;
+                        }
+                        else if (evt.type === 'eid' && evt.eidStatus !== 'work') {
+                            // Saved religious holiday (rest). If weekday -> 8
+                            if (isWeekday) dayHours = 8; 
+                        }
+                    } else {
+                        // No event. Check Implicit National Holiday
+                        if (isNat && isWeekday) {
+                            dayHours = 8; // Request: +8 for Holiday inside week if not worked
+                        }
+                    }
+                    tYearWorkHours += dayHours;
 
-                             if(d.getMonth()===mth) tMonth += effectiveHours;
-                             if(d>=weekStart && d<=weekEnd) tWeek += effectiveHours;
-                         } else if(evt.type==='absent') {
-                             net -= 8;
-                         }
+                    // ----------------------------------------
+                    // B) Net Balance (Net) & Monthly/Weekly
+                    // ----------------------------------------
+                    if (evt) {
+                        if (evt.type === 'work' || evt.type === 'paid' || (evt.type === 'eid' && evt.eidStatus === 'work')) {
+                            let h = evt.hours || 0;
+                            let effectiveHours = (evt.type === 'paid') ? 8 : (isRam ? (h + 1) : h);
+                            
+                            // Fix for Net Balance (Eid Work Logic)
+                            if ((evt.type === 'eid' && evt.eidStatus === 'work') || (evt.type === 'work' && isNat)) {
+                                // Working on a holiday (bonus) adds full hours to net
+                                net += effectiveHours;
+                            } else {
+                                // Normal work deducts the standard 8h obligation
+                                net += (effectiveHours - 8);
+                            }
 
-                         if(evt.type==='sick') { tSickDays++; }
-                     }
-                });
-                
-                // --- 2. Corrected SATURDAY Loop (Iterate ALL Saturdays up to today) ---
-                const startOfYear = new Date(yr, 0, 1);
-                // We calculate up to today to avoid massive negative balance for the whole future year
-                const calcUntil = new Date(); 
-                
-                for (let d = new Date(startOfYear); d <= calcUntil; d.setDate(d.getDate() + 1)) {
-                    if (d.getFullYear() !== yr) continue;
-                    if (d.getDay() === 6) { // Saturday
-                        const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                        const evt = window.appData.events[k];
-                        
-                        // Condition: Work OR Sick OR Paid OR Eid-Work -> +4
+                            if (d.getMonth() === mth) tMonth += effectiveHours;
+                            if (d >= weekStart && d <= weekEnd) tWeek += effectiveHours;
+                        } else if (evt.type === 'absent') {
+                            net -= 8;
+                        }
+                        if (evt.type === 'sick') tSickDays++;
+                    }
+
+                    // ----------------------------------------
+                    // C) Saturday Balance (Sat)
+                    // ----------------------------------------
+                    if (dayNum === 6) { // Saturday
                         if (evt && (evt.type === 'work' || evt.type === 'sick' || evt.type === 'paid' || (evt.type === 'eid' && evt.eidStatus === 'work'))) {
                             sat += 4;
                         } else {
-                            // Empty OR Absent OR anything else -> -4
                             sat -= 4;
                         }
                     }
                 }
 
-                // Sunday & Holiday Logic (Recoverable Days)
+                // ----------------------------------------
+                // D) Sunday & Holiday Pending (Count)
+                // ----------------------------------------
                 const used = Object.values(window.appData.events).filter(e=>e.type==='recup').map(e=>e.recupTarget);
                 Object.entries(window.appData.events).forEach(([k,evt]) => { 
                     const d = new Date(k);
-                    // Check if it's a worked Sunday OR a worked Eid/Holiday
-                    const isWorkedSunday = (d.getDay() === 0 && evt.type === 'work');
-                    const isWorkedEid = (evt.type === 'eid' && evt.eidStatus === 'work');
-                    
-                    // Also check if a normal 'work' entry was added on a national holiday date
-                    const isNat = nationalHolidays[`${d.getMonth()+1}-${d.getDate()}`];
-                    const isWorkOnNatHoliday = (evt.type === 'work' && isNat); 
+                    if (d.getFullYear() === yr) {
+                        const isWorkedSunday = (d.getDay() === 0 && evt.type === 'work');
+                        const isWorkedEid = (evt.type === 'eid' && evt.eidStatus === 'work');
+                        const isNat = nationalHolidays[`${d.getMonth()+1}-${d.getDate()}`];
+                        const isWorkOnNatHoliday = (evt.type === 'work' && isNat); 
 
-                    if (isWorkedSunday || isWorkedEid || isWorkOnNatHoliday) { 
-                        if (!used.includes(k)) {
-                            pending++; 
+                        if (isWorkedSunday || isWorkedEid || isWorkOnNatHoliday) { 
+                            if (!used.includes(k)) {
+                                pending++; 
+                            }
                         }
                     }
                 });

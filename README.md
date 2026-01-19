@@ -112,6 +112,23 @@
         .day-cell.nat-holiday span { color: #880e4f !important; }
         body.dark-mode .day-cell.nat-holiday { background-color: #4a1c2d !important; color: #fce4ec !important; }
         
+        /* FIX: Ensure WORK on a National Holiday takes precedence visually */
+        .day-cell.nat-holiday.st-work {
+            background-color: var(--work) !important;
+            color: white !important;
+            border: 3px solid #ec407a !important; /* Pink border to remind it's a holiday */
+        }
+        .day-cell.nat-holiday.st-work span { color: white !important; }
+
+        /* FIX: Worked Eid Style */
+        .day-cell.worked-eid { 
+            background-color: var(--eid) !important;
+            border: 3px solid var(--work) !important; 
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+            color: white !important;
+        }
+        .day-cell.worked-eid span { color: white !important; }
+
         .day-cell.is-ramadan { 
             border: 2px solid var(--ramadan) !important;
             background-color: rgba(103, 58, 183, 0.05);
@@ -231,7 +248,7 @@
 
         <div class="stats-grid">
             <div class="stat-card" onclick="window.app.showDetails('net')"><h4>رصيد الساعات</h4><div class="val" id="st-net">0</div><div class="sub">ميزان (+/- 8س)</div></div>
-            <div class="stat-card" onclick="window.app.showDetails('sat')"><h4>رصيد السبت</h4><div class="val" id="st-sat">0</div><div class="sub">عمل (+4) / آخر (-4)</div></div>
+            <div class="stat-card" onclick="window.app.showDetails('sat')"><h4>رصيد السبت</h4><div class="val" id="st-sat">0</div><div class="sub">عمل (+4) / فارغ (-4)</div></div>
             <div class="stat-card" onclick="window.app.showDetails('sunday')"><h4>الأحد والأعياد</h4><div class="val" id="st-sunday">0</div><div class="sub">يوم تعويض</div></div>
             <div class="stat-card" onclick="window.app.showDetails('leave')"><h4>رصيد العطلة</h4><div class="val" id="st-leave">0</div><div class="sub">تراكمي FIFO</div></div>
             <div class="stat-card" onclick="window.app.showDetails('week')"><h4>هذا الأسبوع</h4><div class="val" id="st-week">0</div></div>
@@ -844,8 +861,12 @@
                 while (loopDate < today) {
                     const k = `${loopDate.getFullYear()}-${String(loopDate.getMonth()+1).padStart(2,'0')}-${String(loopDate.getDate()).padStart(2,'0')}`;
                     const evt = window.appData.events[k];
+                    
+                    // --- FIX: Don't auto-fill on National Holidays ---
+                    const isNat = nationalHolidays[`${loopDate.getMonth()+1}-${loopDate.getDate()}`];
+                    
                     if (evt && evt.type === 'work') { lastStart = evt.start; lastEnd = evt.end; }
-                    else if (!evt && loopDate.getDay()!==0 && loopDate.getDay()!==6) {
+                    else if (!evt && loopDate.getDay()!==0 && loopDate.getDay()!==6 && !isNat) {
                         const [h1, m1] = lastStart.split(':').map(Number), [h2, m2] = lastEnd.split(':').map(Number);
                         let diff = (h2*60+m2)-(h1*60+m1); if(diff<0) diff+=24*60;
                         window.appData.events[k] = { type: 'work', start: lastStart, end: lastEnd, hours: parseFloat((diff/60).toFixed(2)), autoFilled: true };
@@ -868,7 +889,11 @@
                     const evt = window.appData.events[key], isNat = nationalHolidays[`${m+1}-${i}`];
                     const isRam = window.app.isRamadan(key);
                     let cls = '', natCls = isNat ? 'nat-holiday' : '', ramCls = isRam ? 'is-ramadan' : '', noteInd = (evt && evt.note) ? '<div class="note-dot"></div>' : '';
-                    if(evt) cls = `st-${evt.type}`;
+                    if(evt) {
+                        cls = `st-${evt.type}`;
+                        // Add specific style for worked holidays/eids
+                        if(evt.type === 'eid' && evt.eidStatus === 'work') cls += ' worked-eid';
+                    }
                     const dObj = new Date(y, m, i), now = new Date(); now.setHours(0,0,0,0);
                     const classes = `day-cell ${dObj.getTime()===now.getTime()?'today':''} ${dObj.getDay()===0||dObj.getDay()===6?'weekend':''} ${natCls} ${ramCls} ${cls}`;
                     grid.innerHTML += `<div class="${classes}" onclick="window.app.openDay('${key}')"><span>${i}</span>${noteInd}</div>`;
@@ -944,7 +969,23 @@
             },
             askDelete: (type, id) => { deleteType=type||'day'; if(type==='msg') pendingMsgId=id; document.getElementById('confirmModal').style.display='flex'; },
             performDelete: () => {
-                if(deleteType==='day') { if(window.appData.events[selectedKey]) { delete window.appData.events[selectedKey]; window.fbDeleteDay(selectedKey); } document.getElementById('dayModal').style.display='none'; window.app.renderCalendar(); }
+                if(deleteType==='day') { 
+                    if(window.appData.events[selectedKey]) { 
+                        delete window.appData.events[selectedKey]; 
+                        window.fbDeleteDay(selectedKey); 
+                        
+                        // Check if it was a national holiday
+                        const d = new Date(selectedKey);
+                        const isNat = nationalHolidays[`${d.getMonth()+1}-${d.getDate()}`];
+                        if(isNat) {
+                            window.app.showLegendToast("تم حذف العمل وعاد اليوم كعطلة رسمية");
+                        } else {
+                            window.app.showLegendToast("تم الحذف بنجاح");
+                        }
+                    } 
+                    document.getElementById('dayModal').style.display='none'; 
+                    window.app.renderCalendar(); 
+                }
                 else if(deleteType==='msg') { window.appData.personal.deletedMsgs.push(pendingMsgId); window.saveData('personal_settings', window.appData.personal); window.app.openInbox(); }
                 document.getElementById('confirmModal').style.display='none';
             },
@@ -997,17 +1038,19 @@
                 const leave = breakdown.pools.reduce((sum, pool) => sum + pool.remaining, 0);
                 let pending = 0;
 
+                // --- 1. Loop through RECORDED events for basic stats ---
                 Object.entries(window.appData.events).forEach(([k, evt]) => {
                      const d = new Date(k);
                      if(d.getFullYear()===yr) {
                          const isRam = window.app.isRamadan(k);
                          
-                         // --- تعديل: حساب المجموع السنوي يشمل العطلة بواقع 8 ساعات ---
+                         // 1. Calculate Total Annual Hours
                          if(evt.type !== 'absent') {
                              let h = evt.hours || 0;
                              let effectiveHours = 0;
-                             // العطلة واليوم المدفوع يحسبان 8 ساعات دائماً
-                             if (evt.type === 'paid' || evt.type === 'holiday') {
+                             
+                             // If it's a paid day (but not worked), assume 8h for totals
+                             if (evt.type === 'paid' || evt.type === 'holiday' || (evt.type === 'eid' && evt.eidStatus === 'rest')) {
                                  effectiveHours = 8;
                              } else if (isRam && h > 0) {
                                  effectiveHours = h + 1;
@@ -1017,10 +1060,19 @@
                              tYearWorkHours += effectiveHours;
                          }
 
-                         // حساب الصافي (الميزان)
+                         // 2. Net & Monthly/Weekly Stats
                          if(evt.type==='work'||evt.type==='paid'||(evt.type==='eid'&&evt.eidStatus==='work')) {
-                             let effectiveHours = (evt.type === 'paid') ? 8 : (isRam ? (evt.hours + 1) : evt.hours);
-                             net += (effectiveHours - 8);
+                             let h = evt.hours || 0;
+                             let effectiveHours = (evt.type === 'paid') ? 8 : (isRam ? (h + 1) : h);
+                             
+                             // --- Fix for Net Balance (Eid Work Logic) ---
+                             if (evt.type === 'eid' && evt.eidStatus === 'work') {
+                                 // Working on a holiday (bonus) adds full hours to net
+                                 net += effectiveHours;
+                             } else {
+                                 // Normal work deducts the standard 8h obligation
+                                 net += (effectiveHours - 8);
+                             }
 
                              if(d.getMonth()===mth) tMonth += effectiveHours;
                              if(d>=weekStart && d<=weekEnd) tWeek += effectiveHours;
@@ -1029,19 +1081,47 @@
                          }
 
                          if(evt.type==='sick') { tSickDays++; }
-                         if(d.getDay() === 6) {
-                             if(evt.type==='work' || evt.type==='paid' || (evt.type==='eid' && evt.eidStatus==='work')) sat+=4;
-                             else sat-=4;
-                         }
                      }
                 });
                 
-                // Sunday Logic
+                // --- 2. Corrected SATURDAY Loop (Iterate ALL Saturdays up to today) ---
+                const startOfYear = new Date(yr, 0, 1);
+                // We calculate up to today to avoid massive negative balance for the whole future year
+                const calcUntil = new Date(); 
+                
+                for (let d = new Date(startOfYear); d <= calcUntil; d.setDate(d.getDate() + 1)) {
+                    if (d.getFullYear() !== yr) continue;
+                    if (d.getDay() === 6) { // Saturday
+                        const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                        const evt = window.appData.events[k];
+                        
+                        // Condition: Work OR Sick OR Paid OR Eid-Work -> +4
+                        if (evt && (evt.type === 'work' || evt.type === 'sick' || evt.type === 'paid' || (evt.type === 'eid' && evt.eidStatus === 'work'))) {
+                            sat += 4;
+                        } else {
+                            // Empty OR Absent OR anything else -> -4
+                            sat -= 4;
+                        }
+                    }
+                }
+
+                // Sunday & Holiday Logic (Recoverable Days)
                 const used = Object.values(window.appData.events).filter(e=>e.type==='recup').map(e=>e.recupTarget);
-                Object.entries(window.appData.events).forEach(([k,e]) => { 
-                    const d=new Date(k);
+                Object.entries(window.appData.events).forEach(([k,evt]) => { 
+                    const d = new Date(k);
+                    // Check if it's a worked Sunday OR a worked Eid/Holiday
+                    const isWorkedSunday = (d.getDay() === 0 && evt.type === 'work');
+                    const isWorkedEid = (evt.type === 'eid' && evt.eidStatus === 'work');
+                    
+                    // Also check if a normal 'work' entry was added on a national holiday date
                     const isNat = nationalHolidays[`${d.getMonth()+1}-${d.getDate()}`];
-                    if(d.getDay()===0 && !isNat && e.type==='work') { if(!used.includes(k)) pending++; }
+                    const isWorkOnNatHoliday = (evt.type === 'work' && isNat); 
+
+                    if (isWorkedSunday || isWorkedEid || isWorkOnNatHoliday) { 
+                        if (!used.includes(k)) {
+                            pending++; 
+                        }
+                    }
                 });
 
                 document.getElementById('st-net').innerHTML = `<span class="${net>=0?'txt-green':'txt-red'}">${net.toFixed(1)}</span>`;
@@ -1081,17 +1161,22 @@
                     for(const [k, evt] of Object.entries(window.appData.events)) {
                         const d = new Date(k);
                         if(d.getFullYear() === yr) {
-                            if(d.getDay() === 0 && evt.type === 'work') {
+                            const isWorkedSunday = (d.getDay() === 0 && evt.type === 'work');
+                            const isWorkedEid = (evt.type === 'eid' && evt.eidStatus === 'work');
+                            
+                            const isNat = nationalHolidays[`${d.getMonth()+1}-${d.getDate()}`];
+                            const isWorkOnNatHoliday = (evt.type === 'work' && isNat);
+
+                            if (isWorkedSunday || isWorkedEid || isWorkOnNatHoliday) {
                                 const isPending = !used.includes(k);
+                                let reason = isWorkedSunday ? 'عمل يوم أحد' : `عمل يوم عيد (${evt.eidName || (isNat ? nationalHolidays[`${d.getMonth()+1}-${d.getDate()}`] : '')})`;
+                                
                                 tempList.push({
-                                    date:k, 
-                                    note: isPending ? 'عمل يوم أحد (يستوجب التعويض)' : 'عمل يوم أحد (تم التعويض)', 
+                                    date: k, 
+                                    note: reason + (isPending ? ' (يستوجب التعويض)' : ' (تم التعويض)'), 
                                     val: evt.hours + 'س', 
                                     type: isPending ? 'neg' : 'pos' 
                                 });
-                            }
-                            else if ((evt.type === 'eid' && evt.eidStatus === 'work') || evt.type === 'nat-holiday') {
-                                tempList.push({date:k, note:`عمل في عيد/عطلة (${evt.note||evt.eidName||''})`, val:evt.hours+'س', type:'neutral'});
                             }
                         }
                     }
@@ -1103,7 +1188,6 @@
                         if(new Date(k).getFullYear() === yr) {
                             if(summary[e.type]) {
                                 summary[e.type].c++;
-                                // --- تعديل: احتساب الساعات للعطلة أيضاً ---
                                 if(e.type === 'work' || e.type === 'paid' || e.type === 'holiday' || (e.type === 'eid' && e.eidStatus === 'work')) {
                                     const isRam = window.app.isRamadan(k);
                                     let effectiveHours = (e.type === 'paid' || e.type === 'holiday') ? 8 : (isRam ? (e.hours + 1) : e.hours);
@@ -1115,7 +1199,6 @@
                     list.innerHTML = `<div class="details-header">ملخص سنة ${yr}</div>`;
                     for(const [key, data] of Object.entries(summary)) {
                         if(data.c > 0) {
-                            // --- تعديل: عرض العطلة بالساعات ---
                             let isHoursType = (key === 'work' || key === 'eid' || key === 'paid' || key === 'holiday');
                             let valStr = isHoursType ? `${data.h.toFixed(1)} ساعة` : `${data.c} يوم`;
                             list.innerHTML += `<div class="detail-item neutral" onclick="window.app.showDetails('year_sub_${key}')"><span>${data.i} ${data.l}</span><span class="d-val">${valStr}</span></div>`;
@@ -1131,7 +1214,6 @@
                     for(const [k, evt] of Object.entries(window.appData.events)) {
                         if(new Date(k).getFullYear() === yr && evt.type === subType) {
                             let val = 'يوم';
-                            // --- تعديل: عرض ساعات العطلة (8س) ---
                             if(evt.type==='work' || evt.type==='paid' || evt.type==='holiday' || (evt.type==='eid' && evt.eidStatus==='work')) {
                                 const isRam = window.app.isRamadan(k);
                                 let effectiveHours = (evt.type === 'paid' || evt.type === 'holiday') ? 8 : (isRam ? (evt.hours + 1) : evt.hours);
@@ -1141,11 +1223,26 @@
                         }
                     }
                 } else if (cat === 'sat') {
-                    for(const [k, evt] of Object.entries(window.appData.events)) {
-                        const d = new Date(k);
-                        if(d.getFullYear() === yr && d.getDay() === 6) {
-                            let st = 'غياب', val = -4, type = 'neg';
-                            if(evt && (evt.type==='work' || evt.type==='paid' || (evt.type==='eid' && evt.eidStatus==='work'))) { st='عمل'; val=4; type='pos'; }
+                    const startOfYear = new Date(yr, 0, 1);
+                    const calcUntil = new Date();
+                    
+                    for (let d = new Date(startOfYear); d <= calcUntil; d.setDate(d.getDate() + 1)) {
+                        if (d.getDay() === 6) {
+                            const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                            const evt = window.appData.events[k];
+                            
+                            let st = 'فارغ', val = -4, type = 'neg';
+                            
+                            if (evt) {
+                                if (evt.type === 'work' || evt.type === 'sick' || evt.type === 'paid' || (evt.type === 'eid' && evt.eidStatus === 'work')) {
+                                    st = (evt.type === 'work' ? 'عمل' : (evt.type === 'sick' ? 'مرض' : 'مدفوع'));
+                                    val = 4;
+                                    type = 'pos';
+                                } else {
+                                    st = (evt.type === 'absent' ? 'غياب' : evt.type);
+                                }
+                            }
+                            
                             tempList.push({date:k, note:st, val:(val>0?'+':'')+val, type});
                         }
                     }
@@ -1156,7 +1253,15 @@
                         const isRam = window.app.isRamadan(k);
                         if(evt.type==='work' || evt.type==='paid' || (evt.type==='eid' && evt.eidStatus==='work')) { 
                             let effectiveHours = (evt.type === 'paid') ? 8 : (isRam ? (evt.hours + 1) : evt.hours);
-                            diff = effectiveHours - 8; note='عمل'; 
+                            
+                            // Net Calculation Fix for Eid
+                            if (evt.type === 'eid' && evt.eidStatus === 'work') {
+                                diff = effectiveHours; // Add full hours
+                                note = 'عمل يوم عيد';
+                            } else {
+                                diff = effectiveHours - 8; 
+                                note = 'عمل';
+                            }
                         }
                         else if(evt.type==='absent') { diff = -8; note='غياب'; }
                         if(diff !== 0) tempList.push({date:k, note, val:(diff>0?'+':'')+diff.toFixed(1), type:diff>=0?'pos':'neg'});
